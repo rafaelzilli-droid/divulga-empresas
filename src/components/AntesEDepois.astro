@@ -1,0 +1,179 @@
+---
+/* Comparação visual antes/depois do perfil no Google.
+   Cards lado-a-lado em ≥640px, empilhados em mobile. */
+---
+
+<section class="py-16 lg:py-20">
+  <div class="container-divulga reveal">
+    <span
+      class="inline-block bg-azul-soft text-azul px-3.5 py-1.5 rounded-full text-[13px] font-semibold mb-3.5"
+      >Antes e depois</span
+    >
+    <h2
+      class="text-[28px] lg:text-4xl font-bold tracking-[-0.02em] leading-[1.2] mb-3.5 max-w-[720px] text-texto"
+    >
+      Veja a diferença na prática.
+    </h2>
+    <p class="text-base lg:text-[17px] text-texto-suave max-w-[600px] mb-10">
+      Um perfil bem cuidado muda como o cliente vê seu negócio.
+    </p>
+
+    <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 reveal-stagger">
+      <!-- ANTES -->
+      <div
+        class="bg-white rounded-[20px] overflow-hidden"
+        style="border: 1px solid #f3d9dc;"
+      >
+        <div
+          class="px-[18px] py-3 text-[13px] font-bold tracking-[0.02em] flex items-center gap-2"
+          style="background: #fef2f3; color: var(--vermelho);"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            width="16"
+            height="16"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+          Antes — sem cuidado
+        </div>
+        <div class="p-5 min-h-[260px] flex flex-col">
+          <div class="bg-bg-suave rounded-lg p-[18px]">
+            <h4 class="text-[15px] mb-2 font-semibold text-texto">Nome do negócio</h4>
+            <div class="text-[13px] text-texto-mais-suave mb-1.5 italic">
+              sem horário cadastrado
+            </div>
+            <div class="text-[13px] text-texto-mais-suave mb-1.5 italic">sem fotos</div>
+            <div
+              class="w-full h-20 rounded-md my-3 flex items-center justify-center text-xs text-texto-mais-suave"
+              style="background: #e5e7eb;"
+            >
+              sem imagem
+            </div>
+            <div class="text-[13px] text-texto-mais-suave mb-1.5 italic">sem avaliações</div>
+            <div class="text-[13px] text-texto-mais-suave italic">
+              informação desatualizada
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DEPOIS -->
+      <div
+        class="bg-white rounded-[20px] overflow-hidden"
+        style="border: 2px solid var(--azul);"
+      >
+        <div
+          class="px-[18px] py-3 text-[13px] font-bold tracking-[0.02em] flex items-center gap-2 bg-azul-soft text-azul"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            width="16"
+            height="16"
+            aria-hidden="true"
+          >
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          Depois — com a Divulga
+        </div>
+        <div class="p-5 min-h-[260px] flex flex-col">
+          <h4 class="text-base mb-1.5 font-semibold text-texto">Marmoraria Bela Pedra</h4>
+          <div class="flex items-center gap-1.5 mb-3 text-[13px] text-texto-suave">
+            <span class="text-amarelo">★★★★★</span>
+            <span>4,9 · 87 avaliações</span>
+          </div>
+
+          <!-- Slots prontos pra fotos reais — gradientes coloridos como placeholder -->
+          <div class="grid grid-cols-3 gap-1.5 mb-3">
+            <div
+              class="aspect-square rounded-md"
+              style="background: linear-gradient(135deg, #fde68a, #f59e0b);"
+              role="img"
+              aria-label="Foto do estabelecimento (placeholder)"
+            >
+            </div>
+            <div
+              class="aspect-square rounded-md"
+              style="background: linear-gradient(135deg, #a7f3d0, #10b981);"
+              role="img"
+              aria-label="Foto do estabelecimento (placeholder)"
+            >
+            </div>
+            <div
+              class="aspect-square rounded-md"
+              style="background: linear-gradient(135deg, #bae6fd, #3b82f6);"
+              role="img"
+              aria-label="Foto do estabelecimento (placeholder)"
+            >
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 text-[13px] text-texto-suave mb-1.5">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              width="14"
+              height="14"
+              class="text-azul shrink-0"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span class="text-verde font-semibold">Aberto agora</span>
+            <span>· fecha às 18h</span>
+          </div>
+          <div class="flex items-center gap-2 text-[13px] text-texto-suave mb-1.5">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              width="14"
+              height="14"
+              class="text-azul shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span>Av. Brasil, 1234 · Fernandópolis</span>
+          </div>
+          <div class="flex items-center gap-2 text-[13px] text-texto-suave">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              width="14"
+              height="14"
+              class="text-azul shrink-0"
+              aria-hidden="true"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+              ></path>
+            </svg>
+            <span>(17) 99108-7969</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

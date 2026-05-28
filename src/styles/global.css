@@ -1,0 +1,247 @@
+@import "tailwindcss";
+
+/* Tokens da paleta da Divulga, espelhando exatamente o rascunho v2.
+   Mantidos como variáveis CSS pra uso em estilos custom (keyframes, SVG inline)
+   e como @theme tokens pra ficarem disponíveis nas classes utilitárias do Tailwind. */
+@theme {
+  --color-azul: #2a6fdb;
+  --color-azul-dark: #1d4fa0;
+  --color-azul-soft: #e8f0fc;
+  --color-vermelho: #e63946;
+  --color-amarelo: #f4c430;
+  --color-verde: #1faa59;
+  --color-whatsapp: #25d366;
+  --color-whatsapp-dark: #1ebe5b;
+  --color-texto: #1a1f2e;
+  --color-texto-suave: #4a5365;
+  --color-texto-mais-suave: #6b7280;
+  --color-bg-suave: #f7f9fc;
+  --color-borda: #e5e9f0;
+  --color-noite: #0f172a;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --radius-card: 12px;
+  --radius-card-lg: 20px;
+
+  --shadow-sm-divulga: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-md-divulga: 0 4px 12px rgba(16, 24, 40, 0.08);
+  --shadow-lg-divulga: 0 12px 32px rgba(42, 111, 219, 0.12);
+}
+
+:root {
+  --azul: #2a6fdb;
+  --azul-dark: #1d4fa0;
+  --azul-soft: #e8f0fc;
+  --vermelho: #e63946;
+  --amarelo: #f4c430;
+  --verde: #1faa59;
+  --whatsapp: #25d366;
+  --whatsapp-dark: #1ebe5b;
+  --texto: #1a1f2e;
+  --texto-suave: #4a5365;
+  --texto-mais-suave: #6b7280;
+  --bg: #ffffff;
+  --bg-suave: #f7f9fc;
+  --borda: #e5e9f0;
+  --radius: 12px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
+  --shadow-lg: 0 12px 32px rgba(42, 111, 219, 0.12);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--texto);
+  background: #ffffff;
+  line-height: 1.6;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  text-wrap: pretty;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+.container-divulga {
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Pulse — usado no badge "+800 empresas" e no pino do mapa */
+@keyframes pulse-divulga {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.2);
+  }
+}
+
+.pulse-dot {
+  animation: pulse-divulga 2s infinite;
+}
+
+/* Cursor piscando do typewriter no hero */
+@keyframes blink-cursor {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.typing-cursor {
+  display: inline-block;
+  width: 1.5px;
+  height: 1em;
+  background: currentColor;
+  vertical-align: -0.15em;
+  margin-left: 1px;
+  animation: blink-cursor 1s steps(2, start) infinite;
+}
+
+/* Mapa de SP — pulse concêntrico no pino */
+@keyframes ping-soft {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  80%,
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.pin-pulse circle.ring-outer {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: ping-soft 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.pin-pulse circle.ring-middle {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: ping-soft 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+  animation-delay: 0.8s;
+}
+
+/* Scroll reveal: estado inicial dos elementos antes de entrarem na viewport.
+   O JS adiciona .is-visible quando o IntersectionObserver dispara. */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 600ms ease-out,
+    transform 600ms ease-out;
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger pra cards filhos de uma grid revelada */
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 500ms ease-out,
+    transform 500ms ease-out;
+}
+
+.reveal-stagger.is-visible > *:nth-child(1) {
+  transition-delay: 0ms;
+}
+.reveal-stagger.is-visible > *:nth-child(2) {
+  transition-delay: 80ms;
+}
+.reveal-stagger.is-visible > *:nth-child(3) {
+  transition-delay: 160ms;
+}
+.reveal-stagger.is-visible > *:nth-child(4) {
+  transition-delay: 240ms;
+}
+.reveal-stagger.is-visible > *:nth-child(5) {
+  transition-delay: 320ms;
+}
+.reveal-stagger.is-visible > *:nth-child(6) {
+  transition-delay: 400ms;
+}
+
+.reveal-stagger.is-visible > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Header com estado "scrolled" — border-bottom mais visível e backdrop-blur mais intenso */
+.site-header {
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    backdrop-filter 200ms ease;
+}
+
+.site-header.is-scrolled {
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom-color: #d6dce6;
+  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* Acessibilidade — quem pediu menos movimento, recebe menos movimento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .pulse-dot,
+  .typing-cursor,
+  .pin-pulse circle.ring-outer,
+  .pin-pulse circle.ring-middle {
+    animation: none;
+  }
+
+  .reveal,
+  .reveal-stagger > * {
+    opacity: 1;
+    transform: none;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Foco visível em elementos interativos pra acessibilidade */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--azul);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

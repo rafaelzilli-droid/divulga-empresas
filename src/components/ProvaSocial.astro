@@ -1,0 +1,77 @@
+---
+import MapaRegiao from "./MapaRegiao.astro";
+
+const depoimentos = [
+  {
+    quote:
+      "Depois que a Divulga assumiu o nosso Google, começou a chegar cliente novo quase toda semana. Hoje o pessoal acha a panificadora pelo celular antes mesmo de saber onde é.",
+    nome: "Márcia Zilvicente",
+    negocio: "Panificadora Poti",
+    iniciais: "MZ",
+    // foto: '/assets/fotos/depoimento-marcia.jpg' — quando houver, ativar slot
+  },
+  {
+    quote:
+      "O bom é que eu não preciso mexer em nada. Eles vêm na loja, tiram foto, postam e ainda passam o relatório no fim do mês.",
+    nome: "João Ricardo",
+    negocio: "Marmoraria Bela Pedra",
+    iniciais: "JR",
+  },
+  {
+    quote:
+      "Já tinha pago empresa de fora pra cuidar do meu Google. Nunca dava certo. A Divulga é da região, vem aqui, conversa e resolve.",
+    nome: "Antônio Silva",
+    negocio: "Auto Center Silva",
+    iniciais: "AS",
+  },
+];
+---
+
+<section class="py-16 lg:py-20">
+  <div class="container-divulga reveal">
+    <h2
+      class="text-[28px] lg:text-4xl font-bold tracking-[-0.02em] leading-[1.2] mb-3.5 max-w-[720px] text-texto"
+    >
+      Quem confia, fica.
+    </h2>
+    <p class="text-base lg:text-[17px] text-texto-suave max-w-[600px] mb-10">
+      Depoimentos de quem já mudou a presença digital do negócio com a Divulga.
+    </p>
+
+    <div
+      class="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-10 reveal-stagger"
+    >
+      {
+        depoimentos.map((d) => (
+          <div class="bg-white border border-borda rounded-[20px] p-6">
+            <p class="text-[15px] text-texto leading-[1.6] mb-5 quote-divulga">
+              {d.quote}
+            </p>
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-full bg-gradient-to-br from-azul to-azul-dark text-white flex items-center justify-center font-bold text-sm shrink-0">
+                {d.iniciais}
+              </div>
+              <div>
+                <div class="font-semibold text-sm text-texto">{d.nome}</div>
+                <div class="text-[13px] text-texto-suave">{d.negocio}</div>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <MapaRegiao />
+  </div>
+</section>
+
+<style>
+  .quote-divulga::before {
+    content: '"';
+    font-size: 36px;
+    color: var(--azul);
+    line-height: 0;
+    margin-right: 4px;
+    vertical-align: -10px;
+  }
+</style>

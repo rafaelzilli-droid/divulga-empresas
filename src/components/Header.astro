@@ -1,0 +1,81 @@
+---
+import { Image } from "astro:assets";
+import logo from "../assets/logo/divulga-logo.png";
+import WhatsAppIcon from "./icons/WhatsAppIcon.astro";
+
+const WA_GABRIEL = "https://wa.me/5517991087969";
+---
+
+<header
+  class="site-header sticky top-0 z-50 bg-white/[0.96] border-b border-borda backdrop-blur-[12px]"
+>
+  <div class="container-divulga">
+    <nav class="flex items-center justify-between gap-4 h-16">
+      <a
+        href="#topo"
+        class="flex items-center shrink-0 no-underline text-texto"
+        aria-label="Divulga Empresas — voltar ao topo"
+      >
+        <Image
+          src={logo}
+          alt="Divulga Empresas — Marketing de Geolocalização"
+          width={520}
+          height={172}
+          loading="eager"
+          class="h-9 sm:h-10 w-auto"
+        />
+      </a>
+
+      <div class="hidden sm:flex items-center gap-7">
+        <a
+          href="#o-que-faz"
+          class="text-sm font-medium text-texto-suave hover:text-azul transition-colors"
+          >O que fazemos</a
+        >
+        <a
+          href="#como-funciona"
+          class="text-sm font-medium text-texto-suave hover:text-azul transition-colors"
+          >Como funciona</a
+        >
+        <a
+          href="#planos"
+          class="text-sm font-medium text-texto-suave hover:text-azul transition-colors"
+          >Planos</a
+        >
+        <a
+          href="#contato"
+          class="text-sm font-medium text-texto-suave hover:text-azul transition-colors"
+          >Contato</a
+        >
+      </div>
+
+      <a
+        href={WA_GABRIEL}
+        target="_blank"
+        rel="noopener"
+        class="inline-flex items-center gap-2 bg-whatsapp hover:bg-whatsapp-dark text-white px-4 py-2.5 rounded-full text-sm font-semibold transition-colors shrink-0"
+      >
+        <WhatsAppIcon size={16} />
+        <span class="sm:hidden">Falar</span>
+        <span class="hidden sm:inline">Falar agora</span>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  // Header ganha border + blur mais intensos depois de rolar ~12px.
+  // Threshold pequeno pra reagir cedo sem ficar "tremendo" perto do topo.
+  const header = document.querySelector<HTMLElement>(".site-header");
+  if (header) {
+    const onScroll = () => {
+      if (window.scrollY > 12) {
+        header.classList.add("is-scrolled");
+      } else {
+        header.classList.remove("is-scrolled");
+      }
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+  }
+</script>

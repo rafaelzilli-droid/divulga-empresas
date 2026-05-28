@@ -1,0 +1,50 @@
+---
+const passos = [
+  {
+    titulo: "A gente vai até você",
+    descricao:
+      "Um dos nossos atendentes visita seu negócio, entende o que você faz e tira as fotos e vídeos necessários.",
+  },
+  {
+    titulo: "Cuidamos do seu perfil",
+    descricao:
+      "Montamos seu perfil completo no Google e Google Maps, otimizado pra você aparecer bem nas buscas.",
+  },
+  {
+    titulo: "Acompanhamento todo mês",
+    descricao:
+      "Você recebe atualizações sobre quem viu seu negócio, te ligou ou foi até a sua loja. E a gente segue ajustando.",
+  },
+];
+---
+
+<section class="py-16 lg:py-20 bg-bg-suave" id="como-funciona">
+  <div class="container-divulga reveal">
+    <span
+      class="inline-block bg-azul-soft text-azul px-3.5 py-1.5 rounded-full text-[13px] font-semibold mb-3.5"
+      >Como funciona</span
+    >
+    <h2
+      class="text-[28px] lg:text-4xl font-bold tracking-[-0.02em] leading-[1.2] mb-3.5 max-w-[720px] text-texto"
+    >
+      Simples, do começo ao fim.
+    </h2>
+    <p class="text-base lg:text-[17px] text-texto-suave max-w-[600px] mb-10">
+      Sem complicação. A gente faz tudo e te entrega resultado.
+    </p>
+
+    <div class="grid gap-4 grid-cols-1 lg:grid-cols-3 reveal-stagger">
+      {
+        passos.map((passo, i) => (
+          <div class="bg-white p-7 rounded-[20px] border border-borda">
+            <div class="w-10 h-10 bg-azul text-white rounded-full flex items-center justify-center text-[17px] font-bold mb-4">
+              {i + 1}
+            </div>
+            <h3 class="text-lg font-bold mb-2 text-texto">{passo.titulo}</h3>
+            <p class="text-texto-suave text-sm leading-[1.6]">{passo.descricao}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

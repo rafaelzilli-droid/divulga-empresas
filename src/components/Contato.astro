@@ -1,0 +1,89 @@
+---
+import WhatsAppIcon from "./icons/WhatsAppIcon.astro";
+
+const vendedores = [
+  {
+    nome: "Gabriel Zilli",
+    cargo: "Sócio",
+    tel: "(17) 99108-7969",
+    iniciais: "GZ",
+    wa: "https://wa.me/5517991087969",
+    // Quando houver foto real, colocar em /public/assets/fotos/gabriel.jpg
+    // e ativar via `foto: '/assets/fotos/gabriel.jpg'`
+  },
+  {
+    nome: "Carlos Bombarda",
+    cargo: "Sócio",
+    tel: "(17) 99150-2287",
+    iniciais: "CB",
+    wa: "https://wa.me/5517991502287",
+  },
+];
+---
+
+<section
+  class="py-16 lg:py-20"
+  id="contato"
+  style="background: linear-gradient(180deg, var(--azul-soft) 0%, #ffffff 100%);"
+>
+  <div class="container-divulga reveal">
+    <span
+      class="inline-block bg-azul-soft text-azul px-3.5 py-1.5 rounded-full text-[13px] font-semibold mb-3.5"
+      >Contato</span
+    >
+    <h2
+      class="text-[28px] lg:text-4xl font-bold tracking-[-0.02em] leading-[1.2] mb-3.5 max-w-[720px] text-texto"
+    >
+      Fale com a gente agora.
+    </h2>
+    <p class="text-base lg:text-[17px] text-texto-suave max-w-[600px] mb-6">
+      Sem formulário, sem espera. Você fala direto com quem vai cuidar do seu negócio.
+    </p>
+
+    <div
+      class="grid gap-4 grid-cols-1 sm:grid-cols-2 sm:max-w-[720px] sm:mx-auto reveal-stagger"
+    >
+      {
+        vendedores.map((v) => (
+          <div class="bg-white border border-borda rounded-[20px] p-7 text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_4px_12px_rgba(16,24,40,0.08)]">
+            <div
+              class="w-[88px] h-[88px] rounded-full mx-auto mb-4 flex items-center justify-center text-white text-[28px] font-bold border-[3px] border-white"
+              style="background: linear-gradient(135deg, var(--azul), var(--azul-dark)); box-shadow: 0 0 0 1px var(--borda);"
+              aria-hidden="true"
+            >
+              {v.iniciais}
+            </div>
+            <div class="text-lg font-bold mb-1 text-texto">{v.nome}</div>
+            <div class="text-[13px] text-texto-suave mb-3.5">{v.cargo}</div>
+            <div class="text-[15px] text-texto mb-4 font-medium">{v.tel}</div>
+            <a
+              href={v.wa}
+              target="_blank"
+              rel="noopener"
+              class="btn-primary-divulga w-full justify-center inline-flex items-center gap-2.5 bg-whatsapp text-white px-6 py-3.5 rounded-xl text-base font-semibold"
+              aria-label={`Falar com ${v.nome} no WhatsApp`}
+            >
+              <WhatsAppIcon size={20} />
+              Falar no WhatsApp
+            </a>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .btn-primary-divulga {
+    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
+    transition:
+      transform 150ms,
+      box-shadow 200ms,
+      background-color 200ms;
+  }
+  .btn-primary-divulga:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+    background-color: var(--whatsapp-dark);
+  }
+</style>

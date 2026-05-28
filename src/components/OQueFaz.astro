@@ -1,0 +1,135 @@
+---
+const pilares = [
+  {
+    titulo: "Perfil otimizado",
+    descricao:
+      "Criamos e organizamos seu perfil no Google Meu Negócio com tudo no lugar: endereço, horário, fotos, produtos.",
+    cor: "azul",
+  },
+  {
+    titulo: "Fotos e vídeos profissionais",
+    descricao:
+      "Imagens reais do seu negócio, fotos 360 e vídeos curtos pra mostrar exatamente o que o cliente vai encontrar.",
+    cor: "vermelho",
+  },
+  {
+    titulo: "Monitoramento mensal",
+    descricao:
+      "Acompanhamos quantas pessoas estão te encontrando e onde dá pra melhorar, com relatório simples todo mês.",
+    cor: "amarelo",
+  },
+  {
+    titulo: "Suporte que vai até você",
+    descricao:
+      "Se precisar, a gente aparece no seu negócio. Nada de só atendimento por telefone distante.",
+    cor: "verde",
+  },
+];
+
+const iconBgClass: Record<string, string> = {
+  azul: "bg-azul/12 text-azul",
+  vermelho: "bg-vermelho/12 text-vermelho",
+  amarelo: "bg-amarelo/15 text-[#b8860b]",
+  verde: "bg-verde/12 text-verde",
+};
+---
+
+<section class="py-16 lg:py-20 bg-bg-suave" id="o-que-faz">
+  <div class="container-divulga reveal">
+    <span
+      class="inline-block bg-azul-soft text-azul px-3.5 py-1.5 rounded-full text-[13px] font-semibold mb-3.5"
+      >O que a Divulga faz</span
+    >
+    <h2
+      class="text-[28px] lg:text-4xl font-bold tracking-[-0.02em] leading-[1.2] mb-3.5 max-w-[720px] text-texto"
+    >
+      A gente cuida do seu Google pra você ser encontrado.
+    </h2>
+    <p class="text-base lg:text-[17px] text-texto-suave max-w-[600px] mb-10">
+      Mais de 800 empresas no interior já contam com a gente pra ser vistas na hora certa.
+    </p>
+
+    <div class="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 reveal-stagger">
+      {
+        pilares.map((p) => (
+          <div class="bg-white p-6 rounded-[20px] border border-borda transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_4px_12px_rgba(16,24,40,0.08)]">
+            <div
+              class={`w-11 h-11 rounded-xl flex items-center justify-center mb-3.5 ${iconBgClass[p.cor]}`}
+            >
+              {p.cor === "azul" && (
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  width="22"
+                  height="22"
+                  aria-hidden="true"
+                >
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+              )}
+              {p.cor === "vermelho" && (
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  width="22"
+                  height="22"
+                  aria-hidden="true"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <polyline points="21 15 16 10 5 21" />
+                </svg>
+              )}
+              {p.cor === "amarelo" && (
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  width="22"
+                  height="22"
+                  aria-hidden="true"
+                >
+                  <line x1="18" y1="20" x2="18" y2="10" />
+                  <line x1="12" y1="20" x2="12" y2="4" />
+                  <line x1="6" y1="20" x2="6" y2="14" />
+                </svg>
+              )}
+              {p.cor === "verde" && (
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  width="22"
+                  height="22"
+                  aria-hidden="true"
+                >
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              )}
+            </div>
+            <h3 class="text-[17px] font-bold mb-1.5 text-texto">{p.titulo}</h3>
+            <p class="text-sm text-texto-suave leading-[1.55]">{p.descricao}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
