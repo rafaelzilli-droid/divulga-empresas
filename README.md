@@ -1,6 +1,6 @@
 # Divulga Empresas — site institucional
 
-Site institucional e de conversão da Divulga Empresas, agência de marketing de geolocalização de Fernandópolis-SP. Stack: **Astro 5 + Tailwind 4**, deploy no **Vercel**.
+Site institucional e de conversão da Divulga Empresas, agência de marketing de geolocalização de Fernandópolis-SP. Stack: **Astro 5 + Tailwind 4**, deploy no **Vercel** (push em `main` faz deploy automático).
 
 O objetivo do site é gerar contato no WhatsApp dos sócios. Todo CTA aponta pra `wa.me/...`.
 
