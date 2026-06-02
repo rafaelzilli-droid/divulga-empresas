@@ -1,22 +1,60 @@
 ---
 /* Mockup animado do Google que vive no hero.
 
-   Sequência (loop):
-     1. Aparece só o campo de busca vazio com cursor piscando.
-     2. Texto "marmoraria perto de mim" é digitado letra-por-letra (~80ms cada).
-     3. Após a busca "enviar", os cards de resultado entram com fade + slide-up.
-     4. Segura ~6s no estado final, então reseta e recomeça.
+   Sequência de cada ciclo (~7s, em loop infinito):
+     0.0s  campo de busca já no topo (posição fixa desde o frame zero) com
+           cursor de texto piscando. Área dos cards já tem espaço reservado,
+           mas os cards estão invisíveis.
+     0.5s  typewriter digita a query do exemplo atual (~80ms/char).
+     ~2.7s mouse cursor entra (fade-in) no centro do campo.
+     ~2.9s mouse desliza pra lupa no canto direito do campo.
+     ~3.6s click animado na lupa (escala 1 → 0.85 → 1 em 180ms).
+     ~3.8s cards fazem fade-in + slide-up dentro do espaço já reservado
+           (sem "pulo" de layout).
+     ~4.8s mouse vai pro card concorrente (hover destaca card).
+     ~5.4s mouse vai pro card destaque (hover destaca card).
+     ~6.0s click no card destaque.
+     ~6.3s fade-out de tudo (cards + cursor + texto).
+     ~6.7s reset silencioso pra próxima query.
 
-   O JS roda no client. Em prefers-reduced-motion, o estado final é exibido direto. */
+   Lista rotaciona 6 estabelecimentos. Cada loop avança um índice.
+
+   A foto do card destaque vem das fotos em assets/fotos/animacao/ via
+   astro:assets — uma por nicho. Quando o arquivo correspondente não existe,
+   o card cai pro placeholder de fachada estilizada (CSS puro).
+
+   Em prefers-reduced-motion: mostra estado final do primeiro exemplo, sem loop. */
+
+import type { ImageMetadata } from "astro";
+
+// Carrega todas as fotos da pasta animacao/ via import.meta.glob.
+// Cada chave é o path; o nome do arquivo (sem extensão) é o nicho.
+const animacaoFotos = import.meta.glob<{ default: ImageMetadata }>(
+  "../../assets/fotos/animacao/*.png",
+  { eager: true }
+);
+
+const animacaoSrcs: Record<string, string> = {};
+for (const [path, mod] of Object.entries(animacaoFotos)) {
+  const match = path.match(/\/([\w-]+)\.png$/);
+  if (match) animacaoSrcs[match[1]] = mod.default.src;
+}
+
+// Serializa o mapping pro client-side JS encontrar a URL otimizada
+const animacaoSrcsJson = JSON.stringify(animacaoSrcs);
 ---
 
-<div class="relative w-full max-w-[420px] mx-auto">
+<div class="relative w-full max-w-[420px] mx-auto" aria-hidden="true">
   <div
-    class="phone-mock bg-white rounded-3xl p-4 border border-borda"
+    class="phone-mock relative bg-white rounded-3xl p-4 border border-borda overflow-hidden flex flex-col"
     style="box-shadow: var(--shadow-lg)"
     data-hero-anim
+    data-srcs={animacaoSrcsJson}
   >
-    <div class="flex items-center gap-2 mb-3 pb-3 border-b border-borda">
+    <!-- Linha do campo de busca — FIXA no topo desde o frame zero -->
+    <div
+      class="search-row flex items-center gap-2 pb-3 border-b border-borda relative z-[2]"
+    >
       <svg class="w-6 h-6 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
         <path
           fill="#4285F4"
@@ -36,56 +74,112 @@
         ></path>
       </svg>
       <div
-        class="flex-1 bg-bg-suave px-3 py-2 rounded-[20px] text-[13px] text-texto-suave overflow-hidden whitespace-nowrap"
+        class="search-field flex-1 bg-bg-suave px-3 py-2 rounded-[20px] text-[13px] text-texto-suave overflow-hidden whitespace-nowrap"
       >
-        <span data-hero-typed></span><span class="typing-cursor" data-hero-cursor></span>
+        <span data-hero-typed></span><span class="typing-cursor" data-hero-text-cursor></span>
       </div>
+      <button
+        type="button"
+        class="search-btn shrink-0 w-8 h-8 rounded-full bg-azul text-white flex items-center justify-center border-0 cursor-pointer"
+        data-hero-search-btn
+        aria-hidden="true"
+        tabindex="-1"
+      >
+        <svg
+          class="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="20" y1="20" x2="16.65" y2="16.65"></line>
+        </svg>
+      </button>
     </div>
 
-    <!-- Card de destaque (Marmoraria Bela Pedra) — slot pronto pra foto real -->
-    <div
-      class="biz-card-main p-3 rounded-xl bg-white border border-borda mb-2 transition-all duration-500 ease-out"
-      data-hero-card="main"
-      style="opacity: 0; transform: translateY(12px);"
-    >
+    <!-- Área dos cards — espaço RESERVADO desde o frame zero (mesmo invisível). -->
+    <div class="cards-area mt-3 flex flex-col gap-2" data-hero-cards-area>
+      <!-- Card destaque (cliente da Divulga) -->
       <div
-        class="hero-biz-img w-full h-[120px] rounded-lg mb-3 relative overflow-hidden"
-        role="img"
-        aria-label="Foto do estabelecimento Marmoraria Bela Pedra (placeholder)"
+        class="biz-card-main p-3 rounded-xl bg-white border border-borda"
+        data-hero-card-main
       >
+        <div
+          class="hero-biz-img w-full h-[120px] rounded-lg mb-3 relative overflow-hidden"
+          data-hero-biz-img
+          role="img"
+          aria-label="Foto do estabelecimento (placeholder)"
+        >
+          <!-- Foto real do estabelecimento — trocada por JS conforme o nicho atual -->
+          <img
+            class="hero-biz-photo absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500"
+            data-hero-foto
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <h4 class="text-[15px] font-semibold mb-1 text-texto" data-hero-main-nome>
+          Marmoraria Bela Pedra
+        </h4>
+        <div
+          class="flex items-center gap-1.5 text-[13px] text-texto-suave mb-1.5"
+          data-hero-main-rating
+        >
+          <span class="text-amarelo">★★★★★</span>
+          <span>4,9 · 87 avaliações</span>
+        </div>
+        <div
+          class="text-xs text-texto-mais-suave flex flex-wrap gap-1.5"
+          data-hero-main-meta
+        >
+          <span class="text-verde font-semibold">● Aberto</span>
+          <span>· Fecha às 18h</span>
+          <span>· Fernandópolis</span>
+        </div>
       </div>
-      <h4 class="text-[15px] font-semibold mb-1 text-texto">Marmoraria Bela Pedra</h4>
-      <div class="flex items-center gap-1.5 text-[13px] text-texto-suave mb-1.5">
-        <span class="text-amarelo">★★★★★</span>
-        <span>4,9 · 87 avaliações</span>
-      </div>
-      <div class="text-xs text-texto-mais-suave flex flex-wrap gap-1.5">
-        <span class="text-verde font-semibold">● Aberto</span>
-        <span>· Fecha às 18h</span>
-        <span>· Fernandópolis</span>
+
+      <!-- Card secundário — concorrente sem otimização -->
+      <div
+        class="biz-card-secondary p-3 rounded-xl bg-white border border-borda"
+        data-hero-card-secondary
+      >
+        <h4
+          class="text-sm font-semibold mb-1 text-texto opacity-60"
+          data-hero-secondary-nome
+        >
+          Marmoraria São José
+        </h4>
+        <div
+          class="flex items-center gap-1.5 text-[13px] text-texto-suave opacity-60"
+          data-hero-secondary-rating
+        >
+          <span class="text-amarelo">★★★★☆</span>
+          <span>4,2</span>
+        </div>
       </div>
     </div>
 
-    <!-- Card secundário — concorrente sem otimização -->
-    <div
-      class="p-3 rounded-xl bg-white border border-borda transition-all duration-500 ease-out"
-      data-hero-card="secondary"
-      style="opacity: 0; transform: translateY(12px);"
-    >
-      <h4 class="text-sm font-semibold mb-1 text-texto opacity-60">Marmoraria São José</h4>
-      <div class="flex items-center gap-1.5 text-[13px] text-texto-suave opacity-60">
-        <span class="text-amarelo">★★★★☆</span>
-        <span>4,2</span>
-      </div>
-    </div>
+    <!-- Cursor de mouse (decorativo, posicionado absolutamente) -->
+    <span
+      class="mouse-cursor"
+      data-hero-mouse-cursor
+      aria-hidden="true"
+    ></span>
   </div>
 </div>
 
 <style>
-  /* Placeholder visual do card de destaque — fachada de comércio estilizada.
-     Quando houver foto real, basta substituir o background por background-image: url(...) */
+  /* Placeholder visual do card de destaque — fachada de comércio estilizada via CSS.
+     Quando o JS encontra a foto real do nicho, o <img data-hero-foto> ganha
+     opacity 1 e cobre o placeholder. */
   .hero-biz-img {
     background: linear-gradient(135deg, #4a5365 0%, #2c3340 100%);
+    transition: background 600ms ease;
   }
   .hero-biz-img::before {
     content: "";
@@ -95,12 +189,13 @@
       linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.3) 100%),
       linear-gradient(
         180deg,
-        #5b8de8 0%,
-        #5b8de8 35%,
-        #c9a47c 35%,
-        #c9a47c 75%,
-        #6b5a47 75%
+        var(--fachada-ceu, #5b8de8) 0%,
+        var(--fachada-ceu, #5b8de8) 35%,
+        var(--fachada-frente, #c9a47c) 35%,
+        var(--fachada-frente, #c9a47c) 75%,
+        var(--fachada-chao, #6b5a47) 75%
       );
+    transition: background 600ms ease;
   }
   .hero-biz-img::after {
     content: "";
@@ -123,80 +218,516 @@
     );
     border-top: 2px solid #3d3429;
   }
+
+  /* Foto real: fica sobre o placeholder. Z-index alto pra cobrir ::before/::after. */
+  .hero-biz-photo {
+    z-index: 1;
+  }
+
+  /* Variações de fachada por nicho — só visíveis quando NÃO há foto real */
+  .hero-biz-img[data-fachada="padaria"] {
+    --fachada-ceu: #e8d4a3;
+    --fachada-frente: #c97f3f;
+    --fachada-chao: #6b4423;
+  }
+  .hero-biz-img[data-fachada="oficina"] {
+    --fachada-ceu: #94a3b8;
+    --fachada-frente: #475569;
+    --fachada-chao: #1e293b;
+  }
+  .hero-biz-img[data-fachada="restaurante"] {
+    --fachada-ceu: #f4c430;
+    --fachada-frente: #b91c1c;
+    --fachada-chao: #5b1818;
+  }
+  .hero-biz-img[data-fachada="pet"] {
+    --fachada-ceu: #86efac;
+    --fachada-frente: #2a6fdb;
+    --fachada-chao: #1d4fa0;
+  }
+  .hero-biz-img[data-fachada="moveis"] {
+    --fachada-ceu: #d6c4a8;
+    --fachada-frente: #8b5a2b;
+    --fachada-chao: #44291a;
+  }
+
+  /* Cards têm sempre seu espaço reservado, mas começam invisíveis */
+  .biz-card-main,
+  .biz-card-secondary {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 500ms ease,
+      transform 500ms cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 200ms ease,
+      border-color 200ms ease;
+  }
+  /* Quando o estado é "expanded", cards aparecem com leve stagger */
+  .phone-mock[data-state="expanded"] .biz-card-main {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0ms, 0ms, 0ms, 0ms;
+  }
+  .phone-mock[data-state="expanded"] .biz-card-secondary {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 120ms, 120ms, 0ms, 0ms;
+  }
+
+  /* Hover states (acionados pelo cursor do mouse fake) */
+  .biz-card-main.is-hovered {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(42, 111, 219, 0.15);
+    border-color: var(--azul);
+  }
+  .biz-card-secondary.is-hovered {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 24, 40, 0.08);
+  }
+  .biz-card-main.is-clicking {
+    transform: translateY(-2px) scale(0.97);
+    transition-duration: 150ms;
+  }
+
+  /* Estado "fading" — tudo perde opacidade pra reset suave */
+  .phone-mock[data-state="fading"] .biz-card-main,
+  .phone-mock[data-state="fading"] .biz-card-secondary {
+    opacity: 0;
+    transition-duration: 300ms;
+  }
+  .phone-mock[data-state="fading"] .search-row {
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+
+  /* Reset silencioso entre ciclos */
+  .phone-mock.no-transition,
+  .phone-mock.no-transition .search-row,
+  .phone-mock.no-transition .biz-card-main,
+  .phone-mock.no-transition .biz-card-secondary,
+  .phone-mock.no-transition .mouse-cursor,
+  .phone-mock.no-transition .hero-biz-photo {
+    transition: none !important;
+  }
+
+  /* Botão da lupa — animação de click */
+  .search-btn {
+    transition:
+      transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 200ms ease;
+  }
+  .search-btn.is-clicking {
+    transform: scale(0.85);
+  }
+
+  /* Cursor de mouse — estilo Linear/Framer minimalista */
+  .mouse-cursor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.85);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 10;
+    transform: translate(-50px, -50px);
+    transition:
+      transform 500ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 250ms ease;
+    will-change: transform, opacity;
+  }
+  .mouse-cursor.is-visible {
+    opacity: 1;
+  }
+  .mouse-cursor.is-clicking {
+    animation: mouse-click 180ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes mouse-click {
+    0% {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(42, 111, 219, 0.4);
+    }
+    50% {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), 0 0 0 8px rgba(42, 111, 219, 0);
+    }
+    100% {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(42, 111, 219, 0);
+    }
+  }
+
+  /* Acessibilidade — quem pediu menos movimento vê o estado final estático */
+  @media (prefers-reduced-motion: reduce) {
+    .phone-mock,
+    .search-row,
+    .biz-card-main,
+    .biz-card-secondary,
+    .hero-biz-img,
+    .hero-biz-img::before,
+    .hero-biz-photo {
+      transition: none !important;
+      animation: none !important;
+    }
+    .mouse-cursor {
+      display: none;
+    }
+  }
 </style>
 
 <script>
-  // Animação do mockup do Google.
-  // Roda em loop até a aba ficar escondida (visibilitychange pausa pra economizar).
-  const root = document.querySelector<HTMLElement>("[data-hero-anim]");
-  if (root) {
-    const typed = root.querySelector<HTMLSpanElement>("[data-hero-typed]");
-    const cursor = root.querySelector<HTMLSpanElement>("[data-hero-cursor]");
-    const cardMain = root.querySelector<HTMLElement>('[data-hero-card="main"]');
-    const cardSecondary = root.querySelector<HTMLElement>('[data-hero-card="secondary"]');
+  // Animação do mockup do Google — vanilla TypeScript, sem dependências.
+  // Roda em loop, pausa em visibilitychange.
 
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const QUERY = "marmoraria perto de mim";
+  type Exemplo = {
+    query: string;
+    nicho: string; // nome do arquivo em assets/fotos/animacao/<nicho>.png
+    fachada: "" | "padaria" | "oficina" | "restaurante" | "pet" | "moveis";
+    destaque: {
+      nome: string;
+      rating: number;
+      avaliacoes: number;
+      fecha: string;
+      cidade: string;
+    };
+    concorrente: { nome: string; rating: number };
+  };
 
-    const showFinalState = () => {
-      if (typed) typed.textContent = QUERY;
-      if (cursor) cursor.style.display = "none";
-      if (cardMain) {
-        cardMain.style.opacity = "1";
-        cardMain.style.transform = "translateY(0)";
+  const exemplos: Exemplo[] = [
+    {
+      query: "marmoraria perto de mim",
+      nicho: "marmoraria",
+      fachada: "",
+      destaque: {
+        nome: "Marmoraria Bela Pedra",
+        rating: 4.9,
+        avaliacoes: 87,
+        fecha: "18h",
+        cidade: "Fernandópolis",
+      },
+      concorrente: { nome: "Marmoraria São José", rating: 4.2 },
+    },
+    {
+      query: "padaria perto de mim",
+      nicho: "padaria",
+      fachada: "padaria",
+      destaque: {
+        nome: "Panificadora Poti",
+        rating: 4.8,
+        avaliacoes: 124,
+        fecha: "20h",
+        cidade: "Potirendaba",
+      },
+      concorrente: { nome: "Padaria do Centro", rating: 3.9 },
+    },
+    {
+      query: "oficina mecânica perto de mim",
+      nicho: "oficina",
+      fachada: "oficina",
+      destaque: {
+        nome: "Auto Center Silva",
+        rating: 4.9,
+        avaliacoes: 92,
+        fecha: "18h",
+        cidade: "Jales",
+      },
+      concorrente: { nome: "Mecânica do Zé", rating: 4.1 },
+    },
+    {
+      query: "restaurante perto de mim",
+      nicho: "restaurante",
+      fachada: "restaurante",
+      destaque: {
+        nome: "Restaurante Sabor da Roça",
+        rating: 4.8,
+        avaliacoes: 156,
+        fecha: "23h",
+        cidade: "Cardoso",
+      },
+      concorrente: { nome: "Restaurante Bom Prato", rating: 3.8 },
+    },
+    {
+      query: "pet shop perto de mim",
+      nicho: "petshop",
+      fachada: "pet",
+      destaque: {
+        nome: "Pet Mania",
+        rating: 4.9,
+        avaliacoes: 73,
+        fecha: "19h",
+        cidade: "Fernandópolis",
+      },
+      concorrente: { nome: "Pet Center", rating: 4.0 },
+    },
+    {
+      query: "loja de móveis perto de mim",
+      nicho: "moveis",
+      fachada: "moveis",
+      destaque: {
+        nome: "Móveis Bela Casa",
+        rating: 4.7,
+        avaliacoes: 108,
+        fecha: "18h",
+        cidade: "Votuporanga",
+      },
+      concorrente: { nome: "Móveis Planejados", rating: 3.7 },
+    },
+  ];
+
+  const labelsPorNicho: Record<string, string> = {
+    marmoraria: "Foto de uma marmoraria",
+    padaria: "Foto de uma padaria",
+    oficina: "Foto de uma oficina mecânica",
+    restaurante: "Foto de um restaurante",
+    petshop: "Foto de um pet shop",
+    moveis: "Foto de uma loja de móveis",
+  };
+
+  // Guarda contra dupla inicialização em HMR/navegação SPA
+  const w = window as unknown as { __divulgaHeroAnimMounted?: boolean };
+  if (!w.__divulgaHeroAnimMounted) {
+    w.__divulgaHeroAnimMounted = true;
+    init();
+  }
+
+  function init() {
+    const root = document.querySelector<HTMLElement>("[data-hero-anim]");
+    if (!root) return;
+
+    const searchField = root.querySelector<HTMLElement>(".search-field")!;
+    const searchBtn = root.querySelector<HTMLButtonElement>(
+      "[data-hero-search-btn]"
+    )!;
+    const typed = root.querySelector<HTMLSpanElement>("[data-hero-typed]")!;
+    const textCursor = root.querySelector<HTMLSpanElement>(
+      "[data-hero-text-cursor]"
+    )!;
+    const cardMain = root.querySelector<HTMLElement>("[data-hero-card-main]")!;
+    const cardSecondary = root.querySelector<HTMLElement>(
+      "[data-hero-card-secondary]"
+    )!;
+    const mouse = root.querySelector<HTMLElement>("[data-hero-mouse-cursor]")!;
+    const fachadaEl = root.querySelector<HTMLElement>("[data-hero-biz-img]")!;
+    const fotoEl = root.querySelector<HTMLImageElement>("[data-hero-foto]")!;
+    const mainNome = root.querySelector<HTMLElement>("[data-hero-main-nome]")!;
+    const mainRating = root.querySelector<HTMLElement>(
+      "[data-hero-main-rating]"
+    )!;
+    const mainMeta = root.querySelector<HTMLElement>("[data-hero-main-meta]")!;
+    const secNome = root.querySelector<HTMLElement>(
+      "[data-hero-secondary-nome]"
+    )!;
+    const secRating = root.querySelector<HTMLElement>(
+      "[data-hero-secondary-rating]"
+    )!;
+
+    // Lê o mapping nicho→URL das fotos otimizadas
+    let animacaoSrcs: Record<string, string> = {};
+    try {
+      animacaoSrcs = JSON.parse(root.dataset.srcs || "{}");
+    } catch {
+      animacaoSrcs = {};
+    }
+
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    const setExemplo = (ex: Exemplo) => {
+      const mainStars =
+        ex.destaque.rating >= 4.7
+          ? "★★★★★"
+          : ex.destaque.rating >= 4.0
+            ? "★★★★☆"
+            : "★★★☆☆";
+      const secStars =
+        ex.concorrente.rating >= 4.0 ? "★★★★☆" : "★★★☆☆";
+      const ratingBR = (n: number) => n.toFixed(1).replace(".", ",");
+
+      mainNome.textContent = ex.destaque.nome;
+      mainRating.innerHTML = `<span class="text-amarelo">${mainStars}</span><span>${ratingBR(ex.destaque.rating)} · ${ex.destaque.avaliacoes} avaliações</span>`;
+      mainMeta.innerHTML = `<span class="text-verde font-semibold">● Aberto</span><span>· Fecha às ${ex.destaque.fecha}</span><span>· ${ex.destaque.cidade}</span>`;
+      secNome.textContent = ex.concorrente.nome;
+      secRating.innerHTML = `<span class="text-amarelo">${secStars}</span><span>${ratingBR(ex.concorrente.rating)}</span>`;
+
+      // Variação CSS da fachada (placeholder)
+      if (ex.fachada) {
+        fachadaEl.setAttribute("data-fachada", ex.fachada);
+      } else {
+        fachadaEl.removeAttribute("data-fachada");
       }
-      if (cardSecondary) {
-        cardSecondary.style.opacity = "1";
-        cardSecondary.style.transform = "translateY(0)";
+
+      // Foto real do nicho: se existir, mostra; senão, esconde e exibe o placeholder
+      const fotoUrl = animacaoSrcs[ex.nicho];
+      if (fotoUrl) {
+        fotoEl.src = fotoUrl;
+        fotoEl.alt = labelsPorNicho[ex.nicho] || "";
+        fotoEl.style.opacity = "1";
+        fachadaEl.setAttribute(
+          "aria-label",
+          labelsPorNicho[ex.nicho] || "Foto do estabelecimento"
+        );
+      } else {
+        fotoEl.removeAttribute("src");
+        fotoEl.alt = "";
+        fotoEl.style.opacity = "0";
+        fachadaEl.setAttribute(
+          "aria-label",
+          "Ilustração do estabelecimento (placeholder)"
+        );
       }
     };
 
-    const showInitialState = () => {
-      if (typed) typed.textContent = "";
-      if (cursor) cursor.style.display = "inline-block";
-      if (cardMain) {
-        cardMain.style.opacity = "0";
-        cardMain.style.transform = "translateY(12px)";
-      }
-      if (cardSecondary) {
-        cardSecondary.style.opacity = "0";
-        cardSecondary.style.transform = "translateY(12px)";
-      }
-    };
-
+    // prefers-reduced-motion: estado final do primeiro exemplo, sem loop
     if (prefersReduced) {
-      showFinalState();
+      setExemplo(exemplos[0]);
+      typed.textContent = exemplos[0].query;
+      textCursor.style.display = "none";
+      root.setAttribute("data-state", "expanded");
+      return;
+    }
+
+    // Estado inicial: pinta primeiro exemplo, marca como "expanded" pra fixar
+    // tamanho do shell — depois volta pro "initial" (cards invisíveis mas com
+    // espaço reservado pela altura do flex column).
+    setExemplo(exemplos[0]);
+    root.setAttribute("data-state", "initial");
+
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(loop);
     } else {
-      const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
-
-      const typeQuery = async () => {
-        if (!typed) return;
-        for (let i = 0; i <= QUERY.length; i++) {
-          typed.textContent = QUERY.slice(0, i);
-          await sleep(80);
-        }
-      };
-
-      const loop = async () => {
-        while (true) {
-          showInitialState();
-          await sleep(600);
-          await typeQuery();
-          await sleep(500);
-          if (cardMain) {
-            cardMain.style.opacity = "1";
-            cardMain.style.transform = "translateY(0)";
-          }
-          await sleep(200);
-          if (cardSecondary) {
-            cardSecondary.style.opacity = "1";
-            cardSecondary.style.transform = "translateY(0)";
-          }
-          await sleep(6500);
-        }
-      };
-
       loop();
+    }
+
+    // Helpers ----------------------------------------------------------------
+
+    const sleep = (ms: number) =>
+      new Promise<void>((r) => window.setTimeout(r, ms));
+
+    const waitIfHidden = (): Promise<void> =>
+      new Promise((resolve) => {
+        if (!document.hidden) return resolve();
+        const onChange = () => {
+          if (!document.hidden) {
+            document.removeEventListener("visibilitychange", onChange);
+            resolve();
+          }
+        };
+        document.addEventListener("visibilitychange", onChange);
+      });
+
+    const CURSOR_HALF = 7;
+
+    const moveCursor = (x: number, y: number, duration = 500) => {
+      mouse.style.transitionDuration = `${duration}ms, 250ms`;
+      mouse.style.transform = `translate(${x - CURSOR_HALF}px, ${y - CURSOR_HALF}px)`;
+    };
+
+    const centerOf = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      const p = root.getBoundingClientRect();
+      return {
+        x: r.left - p.left + r.width / 2,
+        y: r.top - p.top + r.height / 2,
+      };
+    };
+
+    const typeQuery = async (query: string) => {
+      for (let i = 0; i <= query.length; i++) {
+        typed.textContent = query.slice(0, i);
+        await sleep(80);
+      }
+    };
+
+    // Sequência principal ----------------------------------------------------
+
+    async function loop() {
+      let idx = 0;
+      while (true) {
+        await waitIfHidden();
+
+        const ex = exemplos[idx];
+        setExemplo(ex);
+
+        // 0.0s — estado inicial: campo já no topo, cards invisíveis mas
+        // ocupando seu espaço, mouse fora da viewport
+        root.classList.add("no-transition");
+        root.setAttribute("data-state", "initial");
+        typed.textContent = "";
+        textCursor.style.display = "inline-block";
+        mouse.classList.remove("is-visible", "is-clicking");
+        cardMain.classList.remove("is-hovered", "is-clicking");
+        cardSecondary.classList.remove("is-hovered");
+        mouse.style.transitionDuration = "0ms";
+        mouse.style.transform = "translate(-50px, -50px)";
+        void root.offsetHeight;
+        root.classList.remove("no-transition");
+
+        await sleep(500);
+
+        // 0.5s → ~2.5s — typewriter
+        await typeQuery(ex.query);
+
+        // ~2.5s — pausa antes do mouse entrar
+        await sleep(250);
+
+        // ~2.75s — cursor aparece no centro do campo
+        const fieldCenter = centerOf(searchField);
+        moveCursor(fieldCenter.x, fieldCenter.y, 0);
+        void mouse.offsetHeight;
+        mouse.classList.add("is-visible");
+        await sleep(120);
+
+        // ~2.9s — desliza pra lupa
+        const btnCenter = centerOf(searchBtn);
+        moveCursor(btnCenter.x, btnCenter.y, 600);
+        await sleep(600);
+
+        // ~3.5s — click na lupa
+        textCursor.style.display = "none";
+        searchBtn.classList.add("is-clicking");
+        mouse.classList.add("is-clicking");
+        await sleep(180);
+        searchBtn.classList.remove("is-clicking");
+        mouse.classList.remove("is-clicking");
+
+        // ~3.7s — cards aparecem (fade-in + slide-up dentro do espaço reservado)
+        await sleep(120);
+        root.setAttribute("data-state", "expanded");
+        await sleep(750);
+
+        // ~4.5s — mouse vai pro card concorrente
+        const secCenter = centerOf(cardSecondary);
+        moveCursor(secCenter.x, secCenter.y, 500);
+        await sleep(450);
+        cardSecondary.classList.add("is-hovered");
+        await sleep(450);
+
+        // ~5.4s — mouse vai pro card destaque
+        cardSecondary.classList.remove("is-hovered");
+        const mainCenter = centerOf(cardMain);
+        moveCursor(mainCenter.x, mainCenter.y, 500);
+        await sleep(450);
+        cardMain.classList.add("is-hovered");
+        await sleep(300);
+
+        // ~6.0s — click no destaque
+        cardMain.classList.add("is-clicking");
+        mouse.classList.add("is-clicking");
+        await sleep(180);
+        cardMain.classList.remove("is-clicking");
+        mouse.classList.remove("is-clicking");
+
+        await sleep(250);
+
+        // ~6.5s — fade-out
+        mouse.classList.remove("is-visible");
+        root.setAttribute("data-state", "fading");
+        await sleep(400);
+
+        // Avança pro próximo exemplo
+        idx = (idx + 1) % exemplos.length;
+      }
     }
   }
 </script>

@@ -1,28 +1,43 @@
 ---
-import MapaRegiao from "./MapaRegiao.astro";
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+// Fotos reais dos depoimentos via astro:assets.
+// Fallback pras iniciais caso algum arquivo não exista.
+const depoimentosFotos = import.meta.glob<{ default: ImageMetadata }>(
+  "../../assets/fotos/depoimentos/*.png",
+  { eager: true }
+);
 
 const depoimentos = [
   {
     quote:
-      "Depois que a Divulga assumiu o nosso Google, começou a chegar cliente novo quase toda semana. Hoje o pessoal acha a panificadora pelo celular antes mesmo de saber onde é.",
-    nome: "Márcia Zilvicente",
-    negocio: "Panificadora Poti",
-    iniciais: "MZ",
-    // foto: '/assets/fotos/depoimento-marcia.jpg' — quando houver, ativar slot
+      "A empresa que cuida do meu Google é a Divulga. Eles cuidam de tudo: fotos, endereço, atualização. É um diferencial que muda o jogo.",
+    nome: "Alessandro Marcelo",
+    negocio: "Starcar Estética Automotiva · São José do Rio Preto",
+    iniciais: "AM",
+    foto: depoimentosFotos["../../assets/fotos/depoimentos/alessandro.png"]
+      ?.default,
+    alt: "Alessandro Marcelo, cliente da Divulga",
   },
   {
     quote:
-      "O bom é que eu não preciso mexer em nada. Eles vêm na loja, tiram foto, postam e ainda passam o relatório no fim do mês.",
-    nome: "João Ricardo",
-    negocio: "Marmoraria Bela Pedra",
-    iniciais: "JR",
+      "A Divulga colocou minha loja na frente das pessoas certas, no lugar certo. Depois de três meses, a Florvie chegou em primeiro lugar nas buscas. Pra quem tem loja física, isso faz toda diferença.",
+    nome: "Isabella Ruiz",
+    negocio: "Florvie Moda Fitness · São José do Rio Preto",
+    iniciais: "IR",
+    foto: depoimentosFotos["../../assets/fotos/depoimentos/isabella.png"]
+      ?.default,
+    alt: "Isabella Ruiz, cliente da Divulga",
   },
   {
     quote:
-      "Já tinha pago empresa de fora pra cuidar do meu Google. Nunca dava certo. A Divulga é da região, vem aqui, conversa e resolve.",
-    nome: "Antônio Silva",
-    negocio: "Auto Center Silva",
-    iniciais: "AS",
+      "Desde o início da parceria com a Divulga, percebi melhora significativa no posicionamento da minha clínica no Google. O diferencial é o acompanhamento mensal e as estratégias aplicadas. Recomendo com total confiança.",
+    nome: "Dayane Tavares",
+    negocio: "Day Tavares Estética · São José do Rio Preto",
+    iniciais: "DT",
+    foto: depoimentosFotos["../../assets/fotos/depoimentos/dayane.png"]?.default,
+    alt: "Dayane Tavares, cliente da Divulga",
   },
 ];
 ---
@@ -35,11 +50,11 @@ const depoimentos = [
       Quem confia, fica.
     </h2>
     <p class="text-base lg:text-[17px] text-texto-suave max-w-[600px] mb-10">
-      Depoimentos de quem já mudou a presença digital do negócio com a Divulga.
+      Depoimentos de quem já mudou a presença digital do negócio com&nbsp;a&nbsp;Divulga.
     </p>
 
     <div
-      class="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-10 reveal-stagger"
+      class="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 reveal-stagger"
     >
       {
         depoimentos.map((d) => (
@@ -48,9 +63,25 @@ const depoimentos = [
               {d.quote}
             </p>
             <div class="flex items-center gap-3">
-              <div class="w-11 h-11 rounded-full bg-gradient-to-br from-azul to-azul-dark text-white flex items-center justify-center font-bold text-sm shrink-0">
-                {d.iniciais}
-              </div>
+              {d.foto ? (
+                <div class="w-11 h-11 rounded-full overflow-hidden shrink-0 border border-borda">
+                  <Image
+                    src={d.foto}
+                    alt={d.alt}
+                    width={88}
+                    height={88}
+                    loading="lazy"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div
+                  class="w-11 h-11 rounded-full bg-gradient-to-br from-azul to-azul-dark text-white flex items-center justify-center font-bold text-sm shrink-0"
+                  aria-hidden="true"
+                >
+                  {d.iniciais}
+                </div>
+              )}
               <div>
                 <div class="font-semibold text-sm text-texto">{d.nome}</div>
                 <div class="text-[13px] text-texto-suave">{d.negocio}</div>
@@ -60,8 +91,6 @@ const depoimentos = [
         ))
       }
     </div>
-
-    <MapaRegiao />
   </div>
 </section>
 

@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://divulgaempresas.com.br/sitemap-index.xml

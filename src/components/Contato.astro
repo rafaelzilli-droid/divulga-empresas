@@ -1,5 +1,18 @@
 ---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
 import WhatsAppIcon from "./icons/WhatsAppIcon.astro";
+
+// Fotos reais dos vendedores via astro:assets — fallback pras iniciais
+// se algum arquivo não existir.
+const vendedoresFotos = import.meta.glob<{ default: ImageMetadata }>(
+  "../../assets/fotos/vendedores/*.png",
+  { eager: true }
+);
+const gabrielFoto =
+  vendedoresFotos["../../assets/fotos/vendedores/gabriel.png"]?.default;
+const carlosFoto =
+  vendedoresFotos["../../assets/fotos/vendedores/carlos.png"]?.default;
 
 const vendedores = [
   {
@@ -8,8 +21,8 @@ const vendedores = [
     tel: "(17) 99108-7969",
     iniciais: "GZ",
     wa: "https://wa.me/5517991087969",
-    // Quando houver foto real, colocar em /public/assets/fotos/gabriel.jpg
-    // e ativar via `foto: '/assets/fotos/gabriel.jpg'`
+    foto: gabrielFoto,
+    alt: "Foto de Gabriel Zilli, sócio da Divulga Empresas",
   },
   {
     nome: "Carlos Bombarda",
@@ -17,6 +30,8 @@ const vendedores = [
     tel: "(17) 99150-2287",
     iniciais: "CB",
     wa: "https://wa.me/5517991502287",
+    foto: carlosFoto,
+    alt: "Foto de Carlos Bombarda, sócio da Divulga Empresas",
   },
 ];
 ---
@@ -37,7 +52,7 @@ const vendedores = [
       Fale com a gente agora.
     </h2>
     <p class="text-base lg:text-[17px] text-texto-suave max-w-[600px] mb-6">
-      Sem formulário, sem espera. Você fala direto com quem vai cuidar do seu negócio.
+      Sem formulário, sem espera. Você fala direto com quem vai cuidar do seu&nbsp;negócio.
     </p>
 
     <div
@@ -46,20 +61,36 @@ const vendedores = [
       {
         vendedores.map((v) => (
           <div class="bg-white border border-borda rounded-[20px] p-7 text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_4px_12px_rgba(16,24,40,0.08)]">
-            <div
-              class="w-[88px] h-[88px] rounded-full mx-auto mb-4 flex items-center justify-center text-white text-[28px] font-bold border-[3px] border-white"
-              style="background: linear-gradient(135deg, var(--azul), var(--azul-dark)); box-shadow: 0 0 0 1px var(--borda);"
-              aria-hidden="true"
-            >
-              {v.iniciais}
-            </div>
+            {v.foto ? (
+              <div
+                class="w-[88px] h-[88px] rounded-full mx-auto mb-4 overflow-hidden border-[3px] border-white"
+                style="box-shadow: 0 0 0 1px var(--borda);"
+              >
+                <Image
+                  src={v.foto}
+                  alt={v.alt}
+                  width={176}
+                  height={176}
+                  loading="lazy"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <div
+                class="w-[88px] h-[88px] rounded-full mx-auto mb-4 flex items-center justify-center text-white text-[28px] font-bold border-[3px] border-white"
+                style="background: linear-gradient(135deg, var(--azul), var(--azul-dark)); box-shadow: 0 0 0 1px var(--borda);"
+                aria-hidden="true"
+              >
+                {v.iniciais}
+              </div>
+            )}
             <div class="text-lg font-bold mb-1 text-texto">{v.nome}</div>
             <div class="text-[13px] text-texto-suave mb-3.5">{v.cargo}</div>
             <div class="text-[15px] text-texto mb-4 font-medium">{v.tel}</div>
             <a
               href={v.wa}
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
               class="btn-primary-divulga w-full justify-center inline-flex items-center gap-2.5 bg-whatsapp text-white px-6 py-3.5 rounded-xl text-base font-semibold"
               aria-label={`Falar com ${v.nome} no WhatsApp`}
             >

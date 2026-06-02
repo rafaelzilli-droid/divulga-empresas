@@ -4,6 +4,14 @@ import logo from "../assets/logo/divulga-logo.png";
 import WhatsAppIcon from "./icons/WhatsAppIcon.astro";
 
 const WA_GABRIEL = "https://wa.me/5517991087969";
+
+const navItems = [
+  { href: "#o-que-faz", label: "O que fazemos" },
+  { href: "#como-funciona", label: "Como funciona" },
+  { href: "#planos", label: "Planos" },
+  { href: "#faq", label: "Perguntas" },
+  { href: "#contato", label: "Contato" },
+];
 ---
 
 <header
@@ -26,46 +34,204 @@ const WA_GABRIEL = "https://wa.me/5517991087969";
         />
       </a>
 
-      <div class="hidden sm:flex items-center gap-7">
-        <a
-          href="#o-que-faz"
-          class="text-sm font-medium text-texto-suave hover:text-azul transition-colors"
-          >O que fazemos</a
-        >
-        <a
-          href="#como-funciona"
-          class="text-sm font-medium text-texto-suave hover:text-azul transition-colors"
-          >Como funciona</a
-        >
-        <a
-          href="#planos"
-          class="text-sm font-medium text-texto-suave hover:text-azul transition-colors"
-          >Planos</a
-        >
-        <a
-          href="#contato"
-          class="text-sm font-medium text-texto-suave hover:text-azul transition-colors"
-          >Contato</a
-        >
+      <!-- Nav desktop -->
+      <div class="hidden sm:flex items-center gap-5 lg:gap-7">
+        {
+          navItems.map((item) => (
+            <a
+              href={item.href}
+              class="text-sm font-medium text-texto-suave hover:text-azul transition-colors"
+            >
+              {item.label}
+            </a>
+          ))
+        }
       </div>
 
+      <!-- CTA desktop -->
       <a
         href={WA_GABRIEL}
         target="_blank"
-        rel="noopener"
-        class="inline-flex items-center gap-2 bg-whatsapp hover:bg-whatsapp-dark text-white px-4 py-2.5 rounded-full text-sm font-semibold transition-colors shrink-0"
+        rel="noopener noreferrer"
+        class="hidden sm:inline-flex items-center gap-2 bg-whatsapp hover:bg-whatsapp-dark text-white px-4 py-2.5 rounded-full text-sm font-semibold transition-colors shrink-0"
       >
         <WhatsAppIcon size={16} />
-        <span class="sm:hidden">Falar</span>
-        <span class="hidden sm:inline">Falar agora</span>
+        Falar agora
       </a>
+
+      <!-- Hamburguer mobile -->
+      <button
+        type="button"
+        class="sm:hidden inline-flex items-center justify-center w-10 h-10 rounded-md text-texto hover:bg-bg-suave transition-colors"
+        data-menu-toggle
+        aria-label="Abrir menu"
+        aria-expanded="false"
+        aria-controls="mobile-drawer"
+      >
+        <svg
+          class="w-6 h-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <line x1="4" y1="6" x2="20" y2="6"></line>
+          <line x1="4" y1="12" x2="20" y2="12"></line>
+          <line x1="4" y1="18" x2="20" y2="18"></line>
+        </svg>
+      </button>
     </nav>
   </div>
 </header>
 
+<!-- Drawer mobile (overlay full-screen + painel à direita) -->
+<div
+  class="mobile-drawer sm:hidden"
+  id="mobile-drawer"
+  data-mobile-drawer
+  aria-hidden="true"
+>
+  <div class="drawer-overlay" data-drawer-close></div>
+  <div
+    class="drawer-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Menu de navegação"
+    data-drawer-panel
+  >
+    <div
+      class="flex items-center justify-between px-5 pt-5 pb-4 border-b border-borda"
+    >
+      <Image
+        src={logo}
+        alt="Divulga Empresas"
+        width={400}
+        height={132}
+        loading="lazy"
+        class="h-9 w-auto"
+      />
+      <button
+        type="button"
+        class="inline-flex items-center justify-center w-10 h-10 rounded-md text-texto hover:bg-bg-suave transition-colors"
+        data-drawer-close
+        aria-label="Fechar menu"
+      >
+        <svg
+          class="w-6 h-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="flex-1 flex flex-col py-2 overflow-y-auto">
+      {
+        navItems.map((item) => (
+          <a href={item.href} class="drawer-nav-link" data-drawer-link>
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="p-5 border-t border-borda">
+      <a
+        href={WA_GABRIEL}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="drawer-cta inline-flex items-center justify-center gap-2.5 w-full bg-whatsapp hover:bg-whatsapp-dark text-white px-6 py-4 rounded-xl text-base font-semibold transition-colors"
+        data-drawer-link
+      >
+        <WhatsAppIcon size={20} />
+        Falar no WhatsApp
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .mobile-drawer {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    visibility: hidden;
+    transition: visibility 0ms linear 300ms;
+  }
+  .mobile-drawer.is-open {
+    pointer-events: auto;
+    visibility: visible;
+    transition-delay: 0ms;
+  }
+  .drawer-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 300ms ease-out;
+  }
+  .mobile-drawer.is-open .drawer-overlay {
+    opacity: 1;
+  }
+  .drawer-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 80%;
+    max-width: 360px;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.08);
+  }
+  .mobile-drawer.is-open .drawer-panel {
+    transform: translateX(0);
+  }
+  .drawer-nav-link {
+    display: block;
+    padding: 18px 24px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--texto);
+    text-decoration: none;
+    text-align: center;
+    border-bottom: 1px solid var(--borda);
+    transition:
+      background-color 150ms,
+      color 150ms;
+  }
+  .drawer-nav-link:hover,
+  .drawer-nav-link:focus-visible {
+    background-color: var(--azul-soft);
+    color: var(--azul);
+  }
+  .drawer-nav-link:last-child {
+    border-bottom: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-drawer,
+    .drawer-overlay,
+    .drawer-panel {
+      transition: none !important;
+    }
+  }
+</style>
+
 <script>
   // Header ganha border + blur mais intensos depois de rolar ~12px.
-  // Threshold pequeno pra reagir cedo sem ficar "tremendo" perto do topo.
   const header = document.querySelector<HTMLElement>(".site-header");
   if (header) {
     const onScroll = () => {
@@ -78,4 +244,90 @@ const WA_GABRIEL = "https://wa.me/5517991087969";
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
   }
+
+  // Drawer mobile: abre/fecha overlay, faz focus trap básico e trava scroll.
+  const drawer = document.querySelector<HTMLElement>("[data-mobile-drawer]");
+  const toggleBtn = document.querySelector<HTMLButtonElement>(
+    "[data-menu-toggle]"
+  );
+  const closeEls = document.querySelectorAll<HTMLElement>(
+    "[data-drawer-close]"
+  );
+  const drawerLinks = document.querySelectorAll<HTMLAnchorElement>(
+    "[data-drawer-link]"
+  );
+  const panel = drawer?.querySelector<HTMLElement>("[data-drawer-panel]");
+
+  let lastFocused: HTMLElement | null = null;
+  let savedScroll = 0;
+
+  const lockScroll = () => {
+    savedScroll = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${savedScroll}px`;
+    document.body.style.width = "100%";
+  };
+  const unlockScroll = () => {
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.width = "";
+    window.scrollTo(0, savedScroll);
+  };
+
+  const open = () => {
+    if (!drawer || !panel) return;
+    lastFocused = document.activeElement as HTMLElement;
+    drawer.classList.add("is-open");
+    drawer.setAttribute("aria-hidden", "false");
+    toggleBtn?.setAttribute("aria-expanded", "true");
+    lockScroll();
+    // Foca o botão de fechar após a animação iniciar
+    window.setTimeout(() => {
+      const firstFocusable = panel.querySelector<HTMLElement>(
+        "button, a, [tabindex]:not([tabindex='-1'])"
+      );
+      firstFocusable?.focus();
+    }, 50);
+  };
+
+  const close = () => {
+    if (!drawer) return;
+    drawer.classList.remove("is-open");
+    drawer.setAttribute("aria-hidden", "true");
+    toggleBtn?.setAttribute("aria-expanded", "false");
+    unlockScroll();
+    lastFocused?.focus();
+  };
+
+  toggleBtn?.addEventListener("click", open);
+  closeEls.forEach((el) => el.addEventListener("click", close));
+  // Links do drawer fecham antes de navegar pra âncora — o href cuida do scroll
+  drawerLinks.forEach((link) => link.addEventListener("click", close));
+
+  // ESC fecha o drawer
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && drawer?.classList.contains("is-open")) {
+      close();
+    }
+  });
+
+  // Focus trap básico — ciclar Tab dentro do drawer
+  panel?.addEventListener("keydown", (e: KeyboardEvent) => {
+    if (e.key !== "Tab") return;
+    const focusables = Array.from(
+      panel.querySelectorAll<HTMLElement>(
+        "button, a, [tabindex]:not([tabindex='-1'])"
+      )
+    ).filter((el) => !el.hasAttribute("disabled"));
+    if (focusables.length === 0) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
 </script>

@@ -1,0 +1,158 @@
+---
+/* Perguntas frequentes — accordion single (uma aberta por vez).
+
+   O texto das perguntas é idêntico ao do JSON-LD FAQPage em Layout.astro —
+   se mudar um, mudar o outro também. (TODO futuro: extrair pra fonte única
+   compartilhada via import.) */
+
+const faq = [
+  {
+    pergunta: "O que é o Google Meu Negócio?",
+    resposta:
+      "O Google Meu Negócio é uma ferramenta gratuita do Google que permite que sua empresa apareça nas buscas e no Google Maps. Quando alguém procura um negócio como o seu na sua região, é o perfil no Google Meu Negócio que mostra suas fotos, horário, endereço e avaliações.",
+  },
+  {
+    pergunta: "Como a Divulga ajuda minha empresa a aparecer no Google?",
+    resposta:
+      "A gente cria e otimiza o seu perfil no Google Meu Negócio com fotos profissionais, vídeos, informações completas e cuida da atualização contínua. Todo mês monitoramos como seu negócio está aparecendo e ajustamos pra você ser encontrado por mais pessoas na sua região.",
+  },
+  {
+    pergunta: "Quais cidades a Divulga atende?",
+    resposta:
+      "Atendemos todo o noroeste paulista, incluindo Fernandópolis, Votuporanga, São José do Rio Preto, Potirendaba, Jales, Cardoso e cidades vizinhas. Nosso atendimento é presencial, com visitas no seu negócio.",
+  },
+  {
+    pergunta: "Como funciona o monitoramento mensal?",
+    resposta:
+      "Todo mês você recebe um relatório simples mostrando quantas pessoas viram seu negócio no Google, quantas te ligaram, quantas pediram rota até sua loja. A partir disso, ajustamos o perfil pra continuar melhorando os resultados.",
+  },
+  {
+    pergunta: "Qual o investimento dos planos?",
+    resposta:
+      "Temos quatro planos anuais: Padrão (R$ 689), Plus (R$ 869), Premium (R$ 1.359) e Diamante (R$ 2.285). A diferença está na quantidade de fotos, vídeos, visitas presenciais e recursos extras como QR Code em placa e site profissional. Fale com a gente no WhatsApp pra ver qual encaixa melhor no seu negócio.",
+  },
+];
+---
+
+<section class="py-16 lg:py-20" id="faq">
+  <div class="container-divulga reveal">
+    <span
+      class="inline-block bg-azul-soft text-azul px-3.5 py-1.5 rounded-full text-[13px] font-semibold mb-3.5"
+      >Perguntas frequentes</span
+    >
+    <h2
+      class="text-[28px] lg:text-4xl font-bold tracking-[-0.02em] leading-[1.2] mb-3.5 max-w-[720px] text-texto"
+    >
+      Tira suas dúvidas.
+    </h2>
+    <p class="text-base lg:text-[17px] text-texto-suave max-w-[600px] mb-10">
+      As perguntas que mais ouvimos de quem está pensando em começar com&nbsp;a&nbsp;gente.
+    </p>
+
+    <div
+      class="flex flex-col gap-3 max-w-[760px] reveal-stagger"
+      data-faq-root
+    >
+      {
+        faq.map((item, i) => {
+          const buttonId = `faq-button-${i}`;
+          const panelId = `faq-panel-${i}`;
+          return (
+            <div class="faq-item bg-white border border-borda rounded-[12px] overflow-hidden">
+              <h3 class="m-0">
+                <button
+                  type="button"
+                  class="faq-trigger flex items-center justify-between w-full px-5 py-4 text-left bg-transparent border-0 cursor-pointer gap-3"
+                  aria-expanded="false"
+                  aria-controls={panelId}
+                  id={buttonId}
+                  data-faq-trigger
+                >
+                  <span class="text-[15px] sm:text-base font-semibold text-texto">
+                    {item.pergunta}
+                  </span>
+                  <svg
+                    class="faq-chevron shrink-0 w-5 h-5 text-azul"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+              </h3>
+              <div
+                class="faq-panel"
+                id={panelId}
+                role="region"
+                aria-labelledby={buttonId}
+              >
+                <div class="faq-panel-inner px-5 pb-5 text-[15px] text-texto-suave leading-[1.6]">
+                  {item.resposta}
+                </div>
+              </div>
+            </div>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-trigger:hover,
+  .faq-trigger:focus-visible {
+    background-color: var(--azul-soft);
+  }
+  .faq-chevron {
+    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Accordion via max-height transition. O :has() propaga o aria-expanded
+     do button (dentro do h3) até o .faq-item pai, e o .faq-panel reage.
+     Valor de 600px é teto generoso pra qualquer resposta — o conteúdo real
+     define a altura visível. */
+  .faq-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .faq-item:has(.faq-trigger[aria-expanded="true"]) .faq-panel {
+    max-height: 600px;
+  }
+  .faq-item:has(.faq-trigger[aria-expanded="true"]) .faq-chevron {
+    transform: rotate(180deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faq-panel,
+    .faq-chevron {
+      transition: none !important;
+    }
+  }
+</style>
+
+<script>
+  // Single-accordion: clicar em uma pergunta fecha as outras.
+  const root = document.querySelector<HTMLElement>("[data-faq-root]");
+  if (root) {
+    const triggers = Array.from(
+      root.querySelectorAll<HTMLButtonElement>("[data-faq-trigger]")
+    );
+    triggers.forEach((trigger) => {
+      trigger.addEventListener("click", () => {
+        const wasOpen = trigger.getAttribute("aria-expanded") === "true";
+        // Fecha todas
+        triggers.forEach((t) => t.setAttribute("aria-expanded", "false"));
+        // Se a clicada não estava aberta, abre ela
+        if (!wasOpen) {
+          trigger.setAttribute("aria-expanded", "true");
+        }
+      });
+    });
+  }
+</script>

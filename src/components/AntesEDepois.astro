@@ -1,6 +1,30 @@
 ---
 /* Comparação visual antes/depois do perfil no Google.
-   Cards lado-a-lado em ≥640px, empilhados em mobile. */
+   Cards lado-a-lado em ≥640px, empilhados em mobile.
+
+   As 3 fotos do perfil "depois" vêm de assets/fotos/padaria/ via astro:assets.
+   Se algum arquivo faltar, mantemos placeholder colorido pra essa posição. */
+
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+const padariaFotos = import.meta.glob<{ default: ImageMetadata }>(
+  "../../assets/fotos/padaria/*.png",
+  { eager: true }
+);
+
+const fotosPoti = [
+  padariaFotos["../../assets/fotos/padaria/potidepois1.png"]?.default,
+  padariaFotos["../../assets/fotos/padaria/potidepois2.png"]?.default,
+  padariaFotos["../../assets/fotos/padaria/potidepois3.png"]?.default,
+];
+
+// Gradientes de fallback quando a foto correspondente não existir
+const fallbackGradients = [
+  "linear-gradient(135deg, #fde68a, #f59e0b)",
+  "linear-gradient(135deg, #a7f3d0, #10b981)",
+  "linear-gradient(135deg, #bae6fd, #3b82f6)",
+];
 ---
 
 <section class="py-16 lg:py-20">
@@ -15,7 +39,7 @@
       Veja a diferença na prática.
     </h2>
     <p class="text-base lg:text-[17px] text-texto-suave max-w-[600px] mb-10">
-      Um perfil bem cuidado muda como o cliente vê seu negócio.
+      Um perfil bem cuidado muda como o cliente vê seu&nbsp;negócio.
     </p>
 
     <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 reveal-stagger">
@@ -47,7 +71,7 @@
         </div>
         <div class="p-5 min-h-[260px] flex flex-col">
           <div class="bg-bg-suave rounded-lg p-[18px]">
-            <h4 class="text-[15px] mb-2 font-semibold text-texto">Nome do negócio</h4>
+            <h3 class="text-[15px] mb-2 font-semibold text-texto">Panificadora Poti</h3>
             <div class="text-[13px] text-texto-mais-suave mb-1.5 italic">
               sem horário cadastrado
             </div>
@@ -91,35 +115,35 @@
           Depois — com a Divulga
         </div>
         <div class="p-5 min-h-[260px] flex flex-col">
-          <h4 class="text-base mb-1.5 font-semibold text-texto">Marmoraria Bela Pedra</h4>
+          <h3 class="text-base mb-1.5 font-semibold text-texto">Panificadora Poti</h3>
           <div class="flex items-center gap-1.5 mb-3 text-[13px] text-texto-suave">
             <span class="text-amarelo">★★★★★</span>
-            <span>4,9 · 87 avaliações</span>
+            <span>4,8 · 92 avaliações</span>
           </div>
 
-          <!-- Slots prontos pra fotos reais — gradientes coloridos como placeholder -->
+          <!-- Fotos reais da Panificadora Poti — fallback pra gradiente colorido se faltar -->
           <div class="grid grid-cols-3 gap-1.5 mb-3">
-            <div
-              class="aspect-square rounded-md"
-              style="background: linear-gradient(135deg, #fde68a, #f59e0b);"
-              role="img"
-              aria-label="Foto do estabelecimento (placeholder)"
-            >
-            </div>
-            <div
-              class="aspect-square rounded-md"
-              style="background: linear-gradient(135deg, #a7f3d0, #10b981);"
-              role="img"
-              aria-label="Foto do estabelecimento (placeholder)"
-            >
-            </div>
-            <div
-              class="aspect-square rounded-md"
-              style="background: linear-gradient(135deg, #bae6fd, #3b82f6);"
-              role="img"
-              aria-label="Foto do estabelecimento (placeholder)"
-            >
-            </div>
+            {
+              fotosPoti.map((foto, i) =>
+                foto ? (
+                  <Image
+                    src={foto}
+                    alt={`Foto ${i + 1} da Panificadora Poti`}
+                    width={200}
+                    height={200}
+                    loading="lazy"
+                    class="aspect-square rounded-md object-cover w-full h-full"
+                  />
+                ) : (
+                  <div
+                    class="aspect-square rounded-md"
+                    style={`background: ${fallbackGradients[i]};`}
+                    role="img"
+                    aria-label="Foto do estabelecimento (placeholder)"
+                  />
+                )
+              )
+            }
           </div>
 
           <div class="flex items-center gap-2 text-[13px] text-texto-suave mb-1.5">
@@ -137,7 +161,7 @@
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
             <span class="text-verde font-semibold">Aberto agora</span>
-            <span>· fecha às 18h</span>
+            <span>· fecha às 19h</span>
           </div>
           <div class="flex items-center gap-2 text-[13px] text-texto-suave mb-1.5">
             <svg
@@ -153,7 +177,7 @@
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
               <circle cx="12" cy="10" r="3"></circle>
             </svg>
-            <span>Av. Brasil, 1234 · Fernandópolis</span>
+            <span>Potirendaba-SP</span>
           </div>
           <div class="flex items-center gap-2 text-[13px] text-texto-suave">
             <svg

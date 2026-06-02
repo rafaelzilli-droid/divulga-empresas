@@ -7,8 +7,10 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
+    "prebuild": "node scripts/generate-assets.mjs",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "generate-assets": "node scripts/generate-assets.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.2.1",
