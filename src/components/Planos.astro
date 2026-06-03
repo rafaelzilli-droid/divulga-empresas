@@ -1,34 +1,11 @@
 ---
-const planos = [
-  {
-    nome: "Padrão",
-    preco: "R$ 689",
-    desc: "O essencial pra estar no Google com qualidade. Perfil otimizado, fotos profissionais e suporte técnico.",
-    wa: "https://wa.me/5517991087969?text=Ol%C3%A1!%20Quero%20saber%20sobre%20o%20plano%20Padr%C3%A3o.",
-    destaque: false,
-  },
-  {
-    nome: "Plus",
-    preco: "R$ 869",
-    desc: "Mais fotos, mais vídeos e seu cartão digital. Ideal pra quem quer presença mais forte.",
-    wa: "https://wa.me/5517991087969?text=Ol%C3%A1!%20Quero%20saber%20sobre%20o%20plano%20Plus.",
-    destaque: false,
-  },
-  {
-    nome: "Premium",
-    preco: "R$ 1.359",
-    desc: "Visitas presenciais durante o ano, vídeo editado, QR code em placa e monitoramento completo.",
-    wa: "https://wa.me/5517991087969?text=Ol%C3%A1!%20Quero%20saber%20sobre%20o%20plano%20Premium.",
-    destaque: false,
-  },
-  {
-    nome: "Diamante",
-    preco: "R$ 2.285",
-    desc: "Tudo do Premium + um site profissional pro seu negócio, feito por especialistas.",
-    wa: "https://wa.me/5517991087969?text=Ol%C3%A1!%20Quero%20saber%20sobre%20o%20plano%20Diamante.",
-    destaque: true,
-  },
-];
+/* Seção de planos enxuta: um card único com título, lead e CTA WhatsApp.
+   A composição completa dos planos é apresentada na conversa, não na página. */
+
+import WhatsAppIcon from "./icons/WhatsAppIcon.astro";
+
+const WA_PLANOS =
+  "https://wa.me/5517991087969?text=Ol%C3%A1!%20Quero%20conhecer%20os%20planos%20da%20Divulga.";
 ---
 
 <section class="py-16 lg:py-20 bg-bg-suave" id="planos">
@@ -37,61 +14,45 @@ const planos = [
       class="inline-block bg-azul-soft text-azul px-3.5 py-1.5 rounded-full text-[13px] font-semibold mb-3.5"
       >Planos</span
     >
-    <h2
-      class="text-[28px] lg:text-4xl font-bold tracking-[-0.02em] leading-[1.2] mb-3.5 max-w-[720px] text-texto"
+    <div
+      class="bg-white border border-borda rounded-[20px] p-8 lg:p-12 max-w-[640px] mx-auto text-center"
     >
-      Um plano pra cada momento do seu negócio.
-    </h2>
-    <p class="text-base lg:text-[17px] text-texto-suave max-w-[600px] mb-10">
-      Todos incluem atendimento, perfil otimizado e suporte. A diferença está no quanto você
-      quer&nbsp;crescer.
-    </p>
-
-    <div class="grid gap-3.5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 reveal-stagger">
-      {
-        planos.map((plano) => (
-          <div
-            class={`plano-card relative flex flex-col bg-white border border-borda rounded-[20px] p-[26px] ${plano.destaque ? "is-destaque" : ""}`}
-          >
-            {plano.destaque && (
-              <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-azul text-white px-3.5 py-1.5 rounded-full text-xs font-bold tracking-[0.03em] whitespace-nowrap">
-                Mais completo
-              </div>
-            )}
-            <div class="text-sm font-semibold text-azul tracking-[0.05em] uppercase mb-2">
-              {plano.nome}
-            </div>
-            <div class="flex items-baseline gap-1.5 mb-1.5">
-              <span class="text-3xl font-extrabold text-texto tracking-[-0.02em]">
-                {plano.preco}
-              </span>
-              <span class="text-[13px] text-texto-suave">/ano</span>
-            </div>
-            <p class="text-sm text-texto-suave mb-[18px] leading-[1.55] flex-1">
-              {plano.desc}
-            </p>
-            <a
-              href={plano.wa}
-              target="_blank"
-              rel="noopener noreferrer"
-              class={`plano-cta block text-center rounded-[10px] py-[11px] font-semibold text-sm transition-colors ${
-                plano.destaque
-                  ? "bg-azul hover:bg-azul-dark text-white"
-                  : "bg-white text-azul border border-azul hover:bg-azul-soft"
-              }`}
-            >
-              Quero esse plano
-            </a>
-          </div>
-        ))
-      }
+      <h2
+        class="text-[24px] lg:text-[28px] font-bold tracking-[-0.02em] leading-[1.2] mb-3 text-texto"
+      >
+        Planos a partir de
+        <span class="text-azul font-extrabold whitespace-nowrap"
+          >R$&nbsp;59,90/mês</span
+        >.
+      </h2>
+      <p class="text-base text-texto-suave leading-[1.55] mb-7">
+        A gente monta o plano certo pro tamanho do seu negócio. Fale com a
+        gente pra entender qual&nbsp;encaixa.
+      </p>
+      <a
+        href={WA_PLANOS}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-primary-divulga inline-flex items-center justify-center gap-2.5 bg-whatsapp text-white px-7 py-4 rounded-xl text-base font-semibold"
+      >
+        <WhatsAppIcon size={20} />
+        Falar com a gente
+      </a>
     </div>
   </div>
 </section>
 
 <style>
-  .plano-card.is-destaque {
-    border: 2px solid var(--azul);
-    background: linear-gradient(180deg, white 0%, var(--azul-soft) 100%);
+  .btn-primary-divulga {
+    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
+    transition:
+      transform 150ms,
+      box-shadow 200ms,
+      background-color 200ms;
+  }
+  .btn-primary-divulga:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+    background-color: var(--whatsapp-dark);
   }
 </style>

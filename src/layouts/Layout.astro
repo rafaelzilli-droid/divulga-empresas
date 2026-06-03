@@ -15,7 +15,7 @@ interface Props {
 }
 
 const DEFAULT_TITLE =
-  "Divulga Empresas — Marketing de Geolocalização no Google | Fernandópolis-SP";
+  "Divulga Empresas — Marketing de Geolocalização no Google | São José do Rio Preto-SP";
 const DEFAULT_DESCRIPTION =
   "A Divulga Empresas cuida do seu perfil no Google e no Google Maps pra você ser encontrado por quem busca um negócio como o seu. +800 empresas atendidas no noroeste paulista.";
 
@@ -52,23 +52,23 @@ const schemaGraph = {
       logo: logoURL,
       image: ogImageURL,
       telephone: "+5517991087969",
-      priceRange: "R$ 689 - R$ 2.285",
+      priceRange: "R$ 59,90/mês +",
       address: {
         "@type": "PostalAddress",
-        addressLocality: "Fernandópolis",
+        addressLocality: "São José do Rio Preto",
         addressRegion: "SP",
         addressCountry: "BR",
       },
       geo: {
         "@type": "GeoCoordinates",
-        latitude: -20.2841,
-        longitude: -50.2467,
+        latitude: -20.8113,
+        longitude: -49.3758,
       },
       areaServed: [
         { "@type": "Place", name: "Noroeste Paulista" },
+        { "@type": "City", name: "São José do Rio Preto" },
         { "@type": "City", name: "Fernandópolis" },
         { "@type": "City", name: "Votuporanga" },
-        { "@type": "City", name: "São José do Rio Preto" },
         { "@type": "City", name: "Potirendaba" },
         { "@type": "City", name: "Jales" },
         { "@type": "City", name: "Cardoso" },
@@ -88,38 +88,17 @@ const schemaGraph = {
       description:
         "Criação, otimização e gestão contínua de perfis no Google Meu Negócio e Google Maps para negócios locais.",
       areaServed: { "@type": "Place", name: "Noroeste Paulista" },
-      offers: [
-        {
-          "@type": "Offer",
-          name: "Plano Padrão",
-          price: "689",
+      offers: {
+        "@type": "AggregateOffer",
+        lowPrice: "59.90",
+        priceCurrency: "BRL",
+        priceSpecification: {
+          "@type": "UnitPriceSpecification",
+          price: "59.90",
           priceCurrency: "BRL",
-          priceSpecification: {
-            "@type": "UnitPriceSpecification",
-            price: "689",
-            priceCurrency: "BRL",
-            unitText: "ANNUAL",
-          },
+          unitText: "MONTHLY",
         },
-        {
-          "@type": "Offer",
-          name: "Plano Plus",
-          price: "869",
-          priceCurrency: "BRL",
-        },
-        {
-          "@type": "Offer",
-          name: "Plano Premium",
-          price: "1359",
-          priceCurrency: "BRL",
-        },
-        {
-          "@type": "Offer",
-          name: "Plano Diamante",
-          price: "2285",
-          priceCurrency: "BRL",
-        },
-      ],
+      },
     },
     {
       "@type": "FAQPage",
@@ -145,7 +124,7 @@ const schemaGraph = {
           name: "Quais cidades a Divulga atende?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Atendemos todo o noroeste paulista, incluindo Fernandópolis, Votuporanga, São José do Rio Preto, Potirendaba, Jales, Cardoso e cidades vizinhas. Nosso atendimento é presencial, com visitas no seu negócio.",
+            text: "Atendemos todo o noroeste paulista, incluindo São José do Rio Preto (nossa sede), Fernandópolis, Votuporanga, Potirendaba, Jales, Cardoso e cidades vizinhas. Nosso atendimento é presencial, com visitas no seu negócio.",
           },
         },
         {
@@ -161,7 +140,7 @@ const schemaGraph = {
           name: "Qual o investimento dos planos?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Temos quatro planos anuais: Padrão (R$ 689), Plus (R$ 869), Premium (R$ 1.359) e Diamante (R$ 2.285). A diferença está na quantidade de fotos, vídeos, visitas presenciais e recursos extras como QR Code em placa e site profissional. Fale com a gente no WhatsApp pra ver qual encaixa melhor no seu negócio.",
+            text: "Nossos planos começam em R$ 59,90 por mês e variam conforme a necessidade do seu negócio — quantidade de fotos, vídeos, visitas presenciais e recursos extras. Fale com a gente no WhatsApp pra ver qual encaixa melhor.",
           },
         },
       ],
@@ -182,15 +161,15 @@ const schemaGraph = {
     <meta name="author" content="Divulga Empresas" />
     <meta
       name="keywords"
-      content="Google Meu Negócio, Google Maps, marketing local, geolocalização, Fernandópolis, noroeste paulista, perfil empresa Google, SEO local interior"
+      content="Google Meu Negócio, Google Maps, marketing local, geolocalização, São José do Rio Preto, Rio Preto, Fernandópolis, Votuporanga, noroeste paulista, perfil empresa Google, SEO local interior"
     />
     <meta name="robots" content="index, follow, max-image-preview:large" />
 
     <!-- Geo tags pra busca local -->
     <meta name="geo.region" content="BR-SP" />
-    <meta name="geo.placename" content="Fernandópolis" />
-    <meta name="geo.position" content="-20.2841;-50.2467" />
-    <meta name="ICBM" content="-20.2841, -50.2467" />
+    <meta name="geo.placename" content="São José do Rio Preto" />
+    <meta name="geo.position" content="-20.8113;-49.3758" />
+    <meta name="ICBM" content="-20.8113, -49.3758" />
 
     <!-- Theme color (PWA / mobile) -->
     <meta name="theme-color" content="#2A6FDB" />

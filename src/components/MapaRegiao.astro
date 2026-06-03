@@ -1,13 +1,13 @@
 ---
 /* Seção própria "Região atendida" — mapa do estado de São Paulo com destaque
    no terço norte/noroeste (a faixa atendida pela Divulga) e pin animado
-   em Fernandópolis.
+   em São José do Rio Preto (sede).
 
    O path do contorno foi extraído do GeoJSON oficial do Brasil
    (codeforgermany/click_that_hood, CC-BY) e simplificado via Douglas-Peucker
    pra ~205 pontos — reconhecível mas leve. Projeção linear em viewBox 480x320
-   com lat/lon do polígono principal. Coordenadas dos pinos (Fernandópolis
-   ~-20.28S/-50.25W, capital ~-23.55S/-46.63W) foram projetadas com a
+   com lat/lon do polígono principal. Coordenadas dos pinos
+   (SJRP ~-20.81S/-49.37W, capital ~-23.55S/-46.63W) foram projetadas com a
    mesma transformação. */
 
 const VIEW_W = 480;
@@ -16,7 +16,7 @@ const VIEW_H = 320;
 const SP_PATH =
   "M 360.58 223.45 L 358.47 229.78 L 353.37 232.38 L 352.14 229.33 L 348.68 228.80 L 347.97 231.86 L 343.19 232.18 L 321.82 243.78 L 318.93 246.16 L 318.50 250.23 L 278.31 277.32 L 275.02 281.10 L 274.88 286.18 L 265.89 293.56 L 269.54 289.68 L 265.13 290.63 L 261.64 288.13 L 263.10 285.51 L 258.52 277.50 L 254.56 281.93 L 250.82 277.57 L 245.15 283.39 L 242.54 281.02 L 243.26 271.16 L 246.56 265.92 L 242.58 262.67 L 238.74 264.35 L 230.65 261.89 L 224.39 263.33 L 222.16 260.87 L 219.69 263.20 L 207.64 262.72 L 207.13 257.06 L 212.69 246.87 L 208.70 245.11 L 205.20 240.47 L 206.10 236.88 L 201.61 234.46 L 197.68 226.66 L 192.89 223.07 L 195.23 221.47 L 195.83 215.93 L 192.58 212.83 L 192.00 206.68 L 195.00 202.58 L 192.48 201.12 L 193.88 200.43 L 191.60 198.83 L 189.63 189.92 L 186.59 186.74 L 178.36 184.41 L 178.85 181.91 L 174.76 177.00 L 165.24 179.71 L 157.67 179.44 L 155.73 177.36 L 149.72 179.35 L 142.11 176.91 L 138.29 180.08 L 135.17 179.06 L 135.81 176.84 L 131.08 172.09 L 118.33 170.01 L 113.07 165.97 L 91.13 165.96 L 89.43 163.49 L 83.63 163.99 L 72.32 158.61 L 69.95 164.79 L 66.72 166.22 L 65.43 163.38 L 53.21 164.28 L 49.18 161.01 L 43.63 163.96 L 30.56 161.21 L 24.99 165.45 L 24.00 162.50 L 57.81 140.50 L 62.60 131.34 L 73.82 119.89 L 73.76 110.25 L 79.07 109.60 L 83.91 102.35 L 83.51 91.94 L 95.92 82.10 L 95.15 73.53 L 97.46 67.73 L 109.22 54.26 L 122.47 49.15 L 127.43 38.75 L 142.37 32.51 L 146.28 28.19 L 151.31 26.44 L 157.06 30.54 L 169.13 31.09 L 179.35 34.36 L 195.75 32.53 L 201.12 36.15 L 209.58 35.24 L 207.49 42.00 L 210.85 50.94 L 213.71 52.06 L 219.11 44.54 L 222.76 45.06 L 223.89 56.09 L 227.25 58.38 L 227.92 50.07 L 230.92 44.90 L 251.08 42.56 L 258.78 43.88 L 259.04 38.50 L 265.26 44.03 L 269.72 42.88 L 271.83 38.79 L 275.77 43.06 L 277.45 36.74 L 284.96 36.11 L 288.25 39.41 L 296.09 35.24 L 297.76 39.48 L 307.80 47.66 L 304.56 53.90 L 304.87 58.77 L 311.51 62.18 L 314.30 68.90 L 309.97 72.38 L 307.37 79.83 L 312.02 84.52 L 313.23 94.34 L 315.93 95.51 L 319.06 102.31 L 318.42 105.76 L 330.33 102.75 L 333.16 104.92 L 335.11 102.83 L 337.54 106.69 L 342.66 108.06 L 342.26 114.91 L 339.93 118.17 L 337.24 117.99 L 337.02 122.37 L 333.89 125.78 L 337.63 134.12 L 332.33 137.38 L 338.25 140.16 L 334.72 142.16 L 332.33 148.46 L 335.07 153.67 L 347.59 159.76 L 346.31 161.37 L 348.27 165.67 L 344.17 167.43 L 351.07 170.37 L 349.89 176.93 L 360.27 175.10 L 360.54 178.22 L 371.60 173.12 L 372.62 175.95 L 375.78 173.73 L 377.33 175.10 L 379.09 171.95 L 381.08 173.00 L 380.37 168.60 L 375.95 168.55 L 382.03 165.13 L 380.92 161.60 L 383.63 161.62 L 383.43 165.08 L 387.69 162.74 L 387.32 165.13 L 389.47 165.17 L 392.76 162.17 L 396.23 165.20 L 402.28 163.41 L 409.34 157.66 L 424.75 153.23 L 428.08 154.26 L 433.24 163.08 L 439.27 164.61 L 445.27 161.36 L 446.62 163.32 L 452.88 162.85 L 456.00 166.23 L 450.80 173.75 L 441.28 176.40 L 439.94 174.53 L 425.56 181.08 L 424.00 189.74 L 420.91 192.79 L 428.85 199.72 L 423.07 200.66 L 419.99 198.06 L 412.58 202.23 L 414.62 204.25 L 411.58 207.14 L 407.25 205.78 L 407.70 208.14 L 404.52 207.93 L 405.33 210.10 L 395.91 212.05 L 395.98 221.55 L 390.75 222.53 L 388.42 220.17 L 374.76 218.55 L 360.58 223.45 Z";
 
-const FERN = { x: 162.16, y: 50.78 };
+const SEDE = { x: 204.6, y: 76.4 }; // São José do Rio Preto (-20.81, -49.37)
 const CAPITAL = { x: 336.65, y: 208.55 };
 
 // Elipse de destaque cobrindo o terço norte/noroeste do estado.
@@ -38,8 +38,8 @@ const DESTAQUE = { cx: 220, cy: 78, rx: 200, ry: 60 };
       Cobrimos todo o noroeste paulista.
     </h2>
     <p class="text-base lg:text-[17px] text-texto-suave max-w-[600px] mb-10">
-      A sede fica em Fernandópolis e atendemos toda a região: Votuporanga, São
-      José do Rio Preto, Jales, Cardoso e&nbsp;vizinhanças.
+      A sede fica em São José do Rio Preto e atendemos toda a região:
+      Fernandópolis, Votuporanga, Potirendaba, Jales, Cardoso e&nbsp;vizinhanças.
     </p>
 
     <div
@@ -56,8 +56,8 @@ const DESTAQUE = { cx: 220, cy: 78, rx: 200, ry: 60 };
           <title id="mapa-titulo">Mapa do estado de São Paulo</title>
           <desc id="mapa-desc"
             >Contorno do estado de São Paulo com a sede da Divulga marcada em
-            Fernandópolis e o terço noroeste do estado destacado como área
-            atendida.</desc
+            São José do Rio Preto e o terço noroeste do estado destacado como
+            área atendida.</desc
           >
 
           <!-- Contorno do estado -->
@@ -80,8 +80,8 @@ const DESTAQUE = { cx: 220, cy: 78, rx: 200, ry: 60 };
             stroke-width="1.8"
             stroke-dasharray="7 5"></ellipse>
 
-          <!-- Pin Fernandópolis com pulse concêntrico -->
-          <g class="pin-pulse" transform={`translate(${FERN.x}, ${FERN.y})`}>
+          <!-- Pin São José do Rio Preto (sede) com pulse concêntrico -->
+          <g class="pin-pulse" transform={`translate(${SEDE.x}, ${SEDE.y})`}>
             <circle class="ring-outer" r="22" fill="#2A6FDB" fill-opacity="0.18"
             ></circle>
             <circle class="ring-middle" r="14" fill="#2A6FDB" fill-opacity="0.32"
@@ -90,27 +90,27 @@ const DESTAQUE = { cx: 220, cy: 78, rx: 200, ry: 60 };
             <circle r="3" fill="white"></circle>
           </g>
 
-          <!-- Label Fernandópolis (callout abaixo do pin) -->
+          <!-- Label SJRP (callout abaixo do pin) -->
           <line
-            x1={FERN.x}
-            y1={FERN.y + 8}
-            x2={FERN.x}
-            y2={FERN.y + 24}
+            x1={SEDE.x}
+            y1={SEDE.y + 8}
+            x2={SEDE.x}
+            y2={SEDE.y + 24}
             stroke="#1a1f2e"
             stroke-width="1"
             stroke-dasharray="2 2"></line>
           <text
-            x={FERN.x}
-            y={FERN.y + 38}
+            x={SEDE.x}
+            y={SEDE.y + 38}
             text-anchor="middle"
             font-family="Inter, sans-serif"
             font-size="12"
             font-weight="700"
-            fill="#1a1f2e">Fernandópolis</text
+            fill="#1a1f2e">São José do Rio Preto</text
           >
           <text
-            x={FERN.x}
-            y={FERN.y + 52}
+            x={SEDE.x}
+            y={SEDE.y + 52}
             text-anchor="middle"
             font-family="Inter, sans-serif"
             font-size="10.5"
