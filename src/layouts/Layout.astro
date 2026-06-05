@@ -7,12 +7,16 @@
    a env var SITE_URL — nada mais precisa mudar. */
 import "../styles/global.css";
 
+import ConsentManager from "../components/consent/ConsentManager.astro";
+
 interface Props {
   title?: string;
   description?: string;
   ogDescription?: string;
   ogImage?: string;
   canonical?: string;
+  /** JSON-LD adicional (ex: WebPage) renderizado depois do @graph principal. */
+  extraSchema?: object;
 }
 
 const DEFAULT_TITLE =
@@ -32,7 +36,12 @@ const {
   ogDescription = DEFAULT_OG_DESCRIPTION,
   ogImage = "/og-image.png",
   canonical,
+  extraSchema,
 } = Astro.props;
+
+// Google Analytics 4 — só carrega se o ID estiver definido
+const GA4_ID = import.meta.env.PUBLIC_GA4_ID ?? "";
+const META_PIXEL_ID = import.meta.env.PUBLIC_META_PIXEL_ID ?? "";
 
 // URLs absolutas — Astro.site vem do config (https://divulgaempresasmarketing.com.br
 // por padrão, ou o que estiver em SITE_URL)
@@ -168,6 +177,87 @@ const schemaGraph = {
 <!doctype html>
 <html lang="pt-BR">
   <head>
+    {/*
+      BOOTSTRAP DO CONSENT MODE v2 — precisa rodar antes do GA4 e antes de
+      qualquer outra ferramenta de rastreamento. Define dataLayer/gtag,
+      seta consent default DENIED (LGPD-first) e aplica de imediato qualquer
+      consent salvo no localStorage. is:inline garante que o navegador
+      execute literalmente no topo do head, sem hoisting/defer do Astro.
+    */}
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        window.dataLayer.push(arguments);
+      }
+      window.gtag = gtag;
+
+      gtag("consent", "default", {
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
+        analytics_storage: "denied",
+        functionality_storage: "denied",
+        personalization_storage: "denied",
+        security_storage: "granted",
+        wait_for_update: 500,
+      });
+
+      // Se houver consentimento salvo, aplica de imediato (antes do GA4 enviar nada)
+      try {
+        var __c = localStorage.getItem("divulga_consent_v1");
+        if (__c) {
+          var p = JSON.parse(__c).preferences;
+          if (p) {
+            gtag("consent", "update", {
+              analytics_storage: p.analytics ? "granted" : "denied",
+              ad_storage: p.marketing ? "granted" : "denied",
+              ad_user_data: p.marketing ? "granted" : "denied",
+              ad_personalization: p.marketing ? "granted" : "denied",
+              functionality_storage: p.functionality ? "granted" : "denied",
+              personalization_storage: p.functionality ? "granted" : "denied",
+            });
+          }
+        }
+      } catch (_) {}
+    </script>
+
+    {
+      GA4_ID && (
+        <>
+          <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`} />
+          <script is:inline define:vars={{ GA4_ID }}>
+            {`
+              gtag('js', new Date());
+              gtag('config', GA4_ID, {
+                anonymize_ip: true,
+                allow_google_signals: false
+              });
+            `}
+          </script>
+        </>
+      )
+    }
+
+    {/*
+      META PIXEL — desativado por padrão. Pra ativar:
+      1. Defina PUBLIC_META_PIXEL_ID no .env (ou nas env vars do Vercel)
+      2. Descomente o bloco abaixo
+      3. Descomente o bloco `if (typeof w.fbq === "function") { ... }` em
+         ConsentManager.astro pra repassar o consent ao Pixel
+    */}
+    {/*
+    {META_PIXEL_ID && (
+      <script is:inline define:vars={{ META_PIXEL_ID }}>
+        {`
+          !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+          fbq('consent', 'revoke');
+          fbq('init', META_PIXEL_ID);
+          fbq('track', 'PageView');
+        `}
+      </script>
+    )}
+    */}
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -259,8 +349,19 @@ const schemaGraph = {
       type="application/ld+json"
       set:html={JSON.stringify(schemaGraph)}
     />
+
+    {/* Schema adicional fornecido pela página (ex: WebPage nas páginas legais) */}
+    {
+      extraSchema && (
+        <script
+          type="application/ld+json"
+          set:html={JSON.stringify(extraSchema)}
+        />
+      )
+    }
   </head>
   <body>
     <slot />
+    <ConsentManager />
   </body>
 </html>

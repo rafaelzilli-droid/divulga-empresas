@@ -1,0 +1,912 @@
+---
+/* Sistema de gerenciamento de consentimento LGPD da Divulga Empresas.
+
+   Inclui:
+   - Banner inferior (primeira visita ou versão dos termos alterada)
+   - Modal de preferências (configuração detalhada por categoria)
+   - API pública em window.DivulgaConsent (open, acceptAll, rejectAll, get, reset)
+   - Integração com Google Consent Mode v2 via gtag('consent', 'update', ...)
+
+   O bloco de bootstrap (consent default DENIED + apply do localStorage) está
+   no <head> do Layout.astro — ele PRECISA rodar antes do GA4 carregar e antes
+   deste componente entrar em cena.
+
+   Versão dos termos: const CONSENT_VERSION embaixo. Pra forçar reconsentimento
+   global (ex: após atualizar políticas), incremente esse valor. */
+---
+
+<!-- Banner — aparece fixed no rodapé na primeira visita -->
+<div
+  class="consent-banner"
+  data-consent-banner
+  role="dialog"
+  aria-labelledby="consent-banner-title"
+  aria-describedby="consent-banner-desc"
+  aria-hidden="true"
+>
+  <div class="consent-banner-inner">
+    <div class="consent-banner-text">
+      <p id="consent-banner-title" class="consent-banner-title">
+        Sua privacidade importa pra gente.
+      </p>
+      <p id="consent-banner-desc" class="consent-banner-desc">
+        Usamos cookies pra melhorar sua experiência neste site, analisar como
+        ele é usado e personalizar conteúdo. Você pode aceitar todos, recusar
+        os não essenciais ou personalizar suas escolhas. Leia nossa <a
+          href="/politica-de-cookies">Política de Cookies</a
+        > e <a href="/politica-de-privacidade">Política de Privacidade</a>.
+      </p>
+    </div>
+    <div class="consent-banner-actions">
+      <button
+        type="button"
+        class="consent-btn consent-btn-outline"
+        data-consent-action="reject_all"
+        aria-label="Rejeitar cookies não essenciais"
+      >
+        Rejeitar não essenciais
+      </button>
+      <button
+        type="button"
+        class="consent-btn consent-btn-link"
+        data-consent-action="customize"
+        aria-label="Personalizar preferências de cookies"
+      >
+        Personalizar
+      </button>
+      <button
+        type="button"
+        class="consent-btn consent-btn-primary"
+        data-consent-action="accept_all"
+        aria-label="Aceitar todos os cookies"
+      >
+        Aceitar todos
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de preferências detalhadas -->
+<div
+  class="consent-modal"
+  data-consent-modal
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="consent-modal-title"
+  aria-hidden="true"
+>
+  <div class="consent-modal-overlay" data-consent-modal-close></div>
+  <div class="consent-modal-panel" data-consent-modal-panel>
+    <header class="consent-modal-header">
+      <h2 id="consent-modal-title" class="consent-modal-title">
+        Preferências de cookies
+      </h2>
+      <button
+        type="button"
+        class="consent-modal-close"
+        data-consent-modal-close
+        aria-label="Fechar preferências"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+        </svg>
+      </button>
+    </header>
+
+    <div class="consent-modal-body">
+      <p class="consent-modal-intro">
+        Escolha quais categorias de cookies podem ser usadas durante sua
+        navegação. Você pode mudar suas preferências a qualquer momento pelo
+        rodapé do site.
+      </p>
+
+      <!-- Categoria 1: Necessários (sempre ativo) -->
+      <section class="consent-cat">
+        <div class="consent-cat-head">
+          <div>
+            <h3 class="consent-cat-title">Cookies necessários</h3>
+            <p class="consent-cat-desc">
+              Essenciais pra navegação e funcionalidades básicas do site. Não
+              podem ser desativados.
+            </p>
+          </div>
+          <label class="consent-toggle is-locked" aria-label="Sempre ativo">
+            <input type="checkbox" checked disabled />
+            <span class="consent-toggle-track"
+              ><span class="consent-toggle-thumb"></span></span
+            >
+          </label>
+        </div>
+        <details class="consent-cat-details">
+          <summary>Ver detalhes</summary>
+          <table class="consent-cat-table">
+            <thead>
+              <tr><th>Cookie</th><th>Finalidade</th><th>Retenção</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>divulga_consent_v1</td>
+                <td>Armazenar sua escolha de cookies</td>
+                <td>1 ano</td>
+              </tr>
+            </tbody>
+          </table>
+        </details>
+      </section>
+
+      <!-- Categoria 2: Funcionalidade -->
+      <section class="consent-cat">
+        <div class="consent-cat-head">
+          <div>
+            <h3 class="consent-cat-title">Cookies de funcionalidade</h3>
+            <p class="consent-cat-desc">
+              Lembrança de preferências (idioma, tema) e recursos opcionais que
+              melhoram sua experiência.
+            </p>
+          </div>
+          <label class="consent-toggle" aria-label="Cookies de funcionalidade">
+            <input type="checkbox" data-consent-toggle="functionality" />
+            <span class="consent-toggle-track"
+              ><span class="consent-toggle-thumb"></span></span
+            >
+          </label>
+        </div>
+        <details class="consent-cat-details">
+          <summary>Ver detalhes</summary>
+          <p class="consent-cat-empty">
+            Atualmente este site não usa cookies de funcionalidade ativos.
+          </p>
+        </details>
+      </section>
+
+      <!-- Categoria 3: Análise -->
+      <section class="consent-cat">
+        <div class="consent-cat-head">
+          <div>
+            <h3 class="consent-cat-title">Cookies de análise</h3>
+            <p class="consent-cat-desc">
+              Coletam dados anônimos sobre como você usa o site (páginas
+              visitadas, tempo de leitura) pra ajudar a gente a melhorar.
+            </p>
+          </div>
+          <label class="consent-toggle" aria-label="Cookies de análise">
+            <input type="checkbox" data-consent-toggle="analytics" />
+            <span class="consent-toggle-track"
+              ><span class="consent-toggle-thumb"></span></span
+            >
+          </label>
+        </div>
+        <details class="consent-cat-details">
+          <summary>Ver detalhes</summary>
+          <table class="consent-cat-table">
+            <thead>
+              <tr><th>Cookie</th><th>Origem</th><th>Retenção</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>_ga, _ga_*</td>
+                <td>Google Analytics 4</td>
+                <td>14 meses</td>
+              </tr>
+            </tbody>
+          </table>
+        </details>
+      </section>
+
+      <!-- Categoria 4: Marketing -->
+      <section class="consent-cat">
+        <div class="consent-cat-head">
+          <div>
+            <h3 class="consent-cat-title">Cookies de marketing</h3>
+            <p class="consent-cat-desc">
+              Usados pra personalizar anúncios e medir a eficácia de campanhas
+              em outras plataformas.
+            </p>
+          </div>
+          <label class="consent-toggle" aria-label="Cookies de marketing">
+            <input type="checkbox" data-consent-toggle="marketing" />
+            <span class="consent-toggle-track"
+              ><span class="consent-toggle-thumb"></span></span
+            >
+          </label>
+        </div>
+        <details class="consent-cat-details">
+          <summary>Ver detalhes</summary>
+          <p class="consent-cat-empty">
+            Atualmente este site não usa cookies de marketing ativos. Esta
+            categoria fica disponível para ativação futura, mediante seu
+            consentimento.
+          </p>
+        </details>
+      </section>
+    </div>
+
+    <footer class="consent-modal-footer">
+      <button
+        type="button"
+        class="consent-btn consent-btn-outline"
+        data-consent-action="reject_all"
+      >
+        Rejeitar tudo
+      </button>
+      <div class="consent-modal-footer-right">
+        <button
+          type="button"
+          class="consent-btn consent-btn-secondary"
+          data-consent-action="save"
+        >
+          Salvar preferências
+        </button>
+        <button
+          type="button"
+          class="consent-btn consent-btn-primary"
+          data-consent-action="accept_all"
+        >
+          Aceitar todos
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<style>
+  /* Banner inferior — não bloqueia o resto da página */
+  .consent-banner {
+    position: fixed;
+    left: 50%;
+    bottom: 20px;
+    transform: translate(-50%, 24px);
+    width: calc(100% - 24px);
+    max-width: 720px;
+    background: white;
+    border: 1px solid var(--borda);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 12px 32px rgba(16, 24, 40, 0.18);
+    padding: 20px 22px;
+    z-index: 9000;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 300ms ease-out,
+      transform 300ms ease-out,
+      visibility 0ms linear 300ms;
+  }
+  .consent-banner.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+    transition:
+      opacity 300ms ease-out,
+      transform 300ms ease-out,
+      visibility 0ms linear 0ms;
+  }
+  .consent-banner-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .consent-banner-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--texto);
+    margin: 0 0 6px;
+  }
+  .consent-banner-desc {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--texto-suave);
+    margin: 0;
+  }
+  .consent-banner-desc a {
+    color: var(--azul);
+    text-decoration: underline;
+  }
+  .consent-banner-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+  @media (min-width: 640px) {
+    .consent-banner-actions {
+      justify-content: flex-end;
+    }
+  }
+
+  /* Botões compartilhados */
+  .consent-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition:
+      background-color 180ms,
+      border-color 180ms,
+      transform 120ms,
+      box-shadow 200ms;
+    background: transparent;
+    font-family: inherit;
+  }
+  .consent-btn-primary {
+    background: var(--whatsapp);
+    color: white;
+    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.28);
+  }
+  .consent-btn-primary:hover {
+    background: var(--whatsapp-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(37, 211, 102, 0.38);
+  }
+  .consent-btn-secondary {
+    background: var(--azul);
+    color: white;
+  }
+  .consent-btn-secondary:hover {
+    background: var(--azul-dark);
+    transform: translateY(-1px);
+  }
+  .consent-btn-outline {
+    background: white;
+    color: var(--texto);
+    border-color: var(--borda);
+  }
+  .consent-btn-outline:hover {
+    border-color: var(--texto-suave);
+    background: var(--bg-suave);
+  }
+  .consent-btn-link {
+    background: transparent;
+    color: var(--azul);
+    padding: 10px 8px;
+  }
+  .consent-btn-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Modal — overlay full screen */
+  .consent-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9500;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 250ms ease-out,
+      visibility 0ms linear 250ms;
+  }
+  .consent-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 250ms ease-out,
+      visibility 0ms linear 0ms;
+  }
+  .consent-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }
+  .consent-modal-panel {
+    position: relative;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    max-width: 520px;
+    width: calc(100% - 24px);
+    max-height: 80vh;
+    margin: 5vh auto;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.96);
+    transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .consent-modal.is-open .consent-modal-panel {
+    transform: scale(1);
+  }
+  .consent-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--borda);
+  }
+  .consent-modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--texto);
+    margin: 0;
+  }
+  .consent-modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 0;
+    background: transparent;
+    color: var(--texto-suave);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 150ms;
+  }
+  .consent-modal-close:hover {
+    background: var(--bg-suave);
+    color: var(--texto);
+  }
+  .consent-modal-body {
+    overflow-y: auto;
+    padding: 18px 22px;
+    flex: 1;
+  }
+  .consent-modal-intro {
+    font-size: 14px;
+    color: var(--texto-suave);
+    line-height: 1.55;
+    margin: 0 0 18px;
+  }
+  .consent-modal-footer {
+    padding: 16px 22px;
+    border-top: 1px solid var(--borda);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .consent-modal-footer-right {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* Categorias dentro do modal */
+  .consent-cat {
+    border: 1px solid var(--borda);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .consent-cat-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .consent-cat-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--texto);
+    margin: 0 0 4px;
+  }
+  .consent-cat-desc {
+    font-size: 13px;
+    color: var(--texto-suave);
+    line-height: 1.5;
+    margin: 0;
+  }
+  .consent-cat-details {
+    margin-top: 10px;
+    font-size: 13px;
+  }
+  .consent-cat-details summary {
+    color: var(--azul);
+    cursor: pointer;
+    user-select: none;
+    font-weight: 500;
+  }
+  .consent-cat-details summary:hover {
+    text-decoration: underline;
+  }
+  .consent-cat-table {
+    width: 100%;
+    margin-top: 8px;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  .consent-cat-table th,
+  .consent-cat-table td {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--borda);
+    vertical-align: top;
+  }
+  .consent-cat-table th {
+    color: var(--texto-mais-suave);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .consent-cat-empty {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: var(--texto-mais-suave);
+    font-style: italic;
+  }
+
+  /* Toggle estilo iOS */
+  .consent-toggle {
+    flex-shrink: 0;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    position: relative;
+  }
+  .consent-toggle input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    cursor: pointer;
+  }
+  .consent-toggle-track {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #d1d5db;
+    border-radius: 999px;
+    transition: background-color 200ms ease;
+    position: relative;
+  }
+  .consent-toggle-thumb {
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  }
+  .consent-toggle input:checked ~ .consent-toggle-track {
+    background: var(--verde);
+  }
+  .consent-toggle input:checked ~ .consent-toggle-track .consent-toggle-thumb {
+    transform: translateX(20px);
+  }
+  .consent-toggle input:focus-visible ~ .consent-toggle-track {
+    outline: 2px solid var(--azul);
+    outline-offset: 2px;
+  }
+  .consent-toggle.is-locked .consent-toggle-track {
+    background: var(--verde);
+    opacity: 0.55;
+  }
+  .consent-toggle.is-locked input {
+    cursor: not-allowed;
+  }
+
+  /* Reduced motion: corta animações */
+  @media (prefers-reduced-motion: reduce) {
+    .consent-banner,
+    .consent-modal,
+    .consent-modal-panel,
+    .consent-toggle-track,
+    .consent-toggle-thumb,
+    .consent-btn {
+      transition: none !important;
+    }
+  }
+</style>
+
+<script>
+  // Sistema de gerenciamento de consentimento — vanilla TypeScript.
+  // O bootstrap (consent default DENIED + apply do localStorage no head)
+  // já rodou antes deste script. Este script cuida da UI e da atualização.
+
+  const CONSENT_VERSION = "1.0";
+  const STORAGE_KEY = "divulga_consent_v1";
+
+  type Method = "accept_all" | "reject_all" | "customized" | "revoke";
+
+  type Preferences = {
+    necessary: true;
+    functionality: boolean;
+    analytics: boolean;
+    marketing: boolean;
+  };
+
+  type HistoryEntry = {
+    timestamp: string;
+    method: Method;
+    preferences: Preferences;
+  };
+
+  type ConsentState = {
+    version: string;
+    timestamp: string;
+    method: Method;
+    preferences: Preferences;
+    history: HistoryEntry[];
+  };
+
+  type WindowWithGtag = Window & {
+    dataLayer?: unknown[];
+    gtag?: (...args: unknown[]) => void;
+    fbq?: (...args: unknown[]) => void;
+    DivulgaConsent?: {
+      open: () => void;
+      acceptAll: () => void;
+      rejectAll: () => void;
+      get: () => ConsentState | null;
+      reset: () => void;
+    };
+  };
+
+  const w = window as WindowWithGtag;
+
+  // ------- Storage helpers --------------------------------------------------
+
+  function readState(): ConsentState | null {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as ConsentState;
+      if (!parsed || typeof parsed !== "object") return null;
+      return parsed;
+    } catch {
+      return null;
+    }
+  }
+
+  function writeState(state: ConsentState) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch {
+      // localStorage cheio ou negado — silenciamos pra não quebrar a página
+    }
+  }
+
+  function defaultPreferences(): Preferences {
+    return {
+      necessary: true,
+      functionality: false,
+      analytics: false,
+      marketing: false,
+    };
+  }
+
+  // ------- gtag bridge ------------------------------------------------------
+
+  /** Reflete as preferências no Google Consent Mode v2. Idempotente. */
+  function pushConsentUpdate(prefs: Preferences) {
+    const gtag = w.gtag;
+    if (typeof gtag !== "function") return;
+    gtag("consent", "update", {
+      analytics_storage: prefs.analytics ? "granted" : "denied",
+      ad_storage: prefs.marketing ? "granted" : "denied",
+      ad_user_data: prefs.marketing ? "granted" : "denied",
+      ad_personalization: prefs.marketing ? "granted" : "denied",
+      functionality_storage: prefs.functionality ? "granted" : "denied",
+      personalization_storage: prefs.functionality ? "granted" : "denied",
+    });
+
+    // Meta Pixel — quando ativado, descomentar:
+    // if (typeof w.fbq === "function") {
+    //   w.fbq("consent", prefs.marketing ? "grant" : "revoke");
+    // }
+  }
+
+  // ------- State transitions ------------------------------------------------
+
+  function commit(method: Method, prefs: Preferences) {
+    const now = new Date().toISOString();
+    const previous = readState();
+    const history: HistoryEntry[] = previous?.history ?? [];
+    history.push({ timestamp: now, method, preferences: prefs });
+    const state: ConsentState = {
+      version: CONSENT_VERSION,
+      timestamp: now,
+      method,
+      preferences: prefs,
+      history,
+    };
+    writeState(state);
+    pushConsentUpdate(prefs);
+    closeBanner();
+    closeModal();
+  }
+
+  function acceptAll() {
+    commit("accept_all", {
+      necessary: true,
+      functionality: true,
+      analytics: true,
+      marketing: true,
+    });
+  }
+
+  function rejectAll() {
+    commit("reject_all", defaultPreferences());
+  }
+
+  function saveCustom() {
+    const prefs: Preferences = {
+      necessary: true,
+      functionality: getToggle("functionality"),
+      analytics: getToggle("analytics"),
+      marketing: getToggle("marketing"),
+    };
+    commit("customized", prefs);
+  }
+
+  function reset() {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {}
+    openBanner();
+  }
+
+  // ------- DOM helpers ------------------------------------------------------
+
+  const banner = document.querySelector<HTMLElement>("[data-consent-banner]");
+  const modal = document.querySelector<HTMLElement>("[data-consent-modal]");
+  const modalPanel = document.querySelector<HTMLElement>(
+    "[data-consent-modal-panel]"
+  );
+
+  function openBanner() {
+    if (!banner) return;
+    banner.classList.add("is-open");
+    banner.setAttribute("aria-hidden", "false");
+    // foca o primeiro botão pra leitor de tela
+    window.setTimeout(() => {
+      const firstBtn = banner.querySelector<HTMLButtonElement>(
+        "[data-consent-action='reject_all']"
+      );
+      firstBtn?.focus();
+    }, 80);
+  }
+
+  function closeBanner() {
+    if (!banner) return;
+    banner.classList.remove("is-open");
+    banner.setAttribute("aria-hidden", "true");
+  }
+
+  let lastFocusedBeforeModal: HTMLElement | null = null;
+
+  function openModal() {
+    if (!modal || !modalPanel) return;
+    lastFocusedBeforeModal = document.activeElement as HTMLElement;
+    // reflete o estado atual nos toggles
+    const current = readState();
+    const prefs = current?.preferences ?? defaultPreferences();
+    setToggle("functionality", prefs.functionality);
+    setToggle("analytics", prefs.analytics);
+    setToggle("marketing", prefs.marketing);
+
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    window.setTimeout(() => {
+      const focusable = modalPanel.querySelector<HTMLElement>(
+        "button, [tabindex]:not([tabindex='-1'])"
+      );
+      focusable?.focus();
+    }, 60);
+  }
+
+  function closeModal() {
+    if (!modal) return;
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    lastFocusedBeforeModal?.focus();
+  }
+
+  function getToggle(name: string): boolean {
+    const el = document.querySelector<HTMLInputElement>(
+      `[data-consent-toggle="${name}"]`
+    );
+    return !!el?.checked;
+  }
+  function setToggle(name: string, value: boolean) {
+    const el = document.querySelector<HTMLInputElement>(
+      `[data-consent-toggle="${name}"]`
+    );
+    if (el) el.checked = value;
+  }
+
+  // ------- Listeners --------------------------------------------------------
+
+  function wireActions(scope: Element | Document) {
+    scope
+      .querySelectorAll<HTMLButtonElement>("[data-consent-action]")
+      .forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const action = btn.getAttribute("data-consent-action");
+          switch (action) {
+            case "accept_all":
+              acceptAll();
+              break;
+            case "reject_all":
+              rejectAll();
+              break;
+            case "customize":
+              closeBanner();
+              openModal();
+              break;
+            case "save":
+              saveCustom();
+              break;
+          }
+        });
+      });
+  }
+  wireActions(document);
+
+  // Fechar modal: overlay e botão X
+  document
+    .querySelectorAll<HTMLElement>("[data-consent-modal-close]")
+    .forEach((el) => el.addEventListener("click", closeModal));
+
+  // Esc fecha o modal (mas NÃO fecha o banner — usuário precisa decidir)
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal?.classList.contains("is-open")) {
+      closeModal();
+    }
+  });
+
+  // Focus trap básico dentro do modal
+  modalPanel?.addEventListener("keydown", (e: KeyboardEvent) => {
+    if (e.key !== "Tab") return;
+    const focusables = Array.from(
+      modalPanel.querySelectorAll<HTMLElement>(
+        "button, input:not([disabled]), a[href], [tabindex]:not([tabindex='-1'])"
+      )
+    );
+    if (focusables.length === 0) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+
+  // ------- API pública ------------------------------------------------------
+
+  w.DivulgaConsent = {
+    open: openModal,
+    acceptAll,
+    rejectAll,
+    get: readState,
+    reset,
+  };
+
+  // ------- Decisão inicial: mostrar banner? --------------------------------
+
+  const current = readState();
+  const needsConsent =
+    !current ||
+    current.version !== CONSENT_VERSION ||
+    !current.preferences ||
+    typeof current.preferences !== "object";
+
+  if (needsConsent) {
+    // mostra banner depois do paint inicial
+    window.requestAnimationFrame(() => openBanner());
+  }
+</script>

@@ -1,0 +1,300 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import WhatsAppFloat from "../components/WhatsAppFloat.astro";
+import LegalLayout from "../components/legal/LegalLayout.astro";
+
+const siteOrigin = Astro.site?.toString().replace(/\/$/, "") ?? "";
+const pageUrl = `${siteOrigin}/politica-de-privacidade`;
+
+const extraSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Política de Privacidade",
+  description:
+    "Política de Privacidade da Divulga Empresas — como tratamos seus dados em conformidade com a LGPD.",
+  url: pageUrl,
+  publisher: { "@id": `${siteOrigin}/#business` },
+  inLanguage: "pt-BR",
+};
+
+const description =
+  "Política de Privacidade da Divulga Empresas. Saiba como coletamos, usamos e protegemos seus dados em conformidade com a Lei Geral de Proteção de Dados (LGPD).";
+---
+
+<Layout
+  title="Política de Privacidade — Divulga Empresas"
+  description={description}
+  extraSchema={extraSchema}
+>
+  <Header />
+  <main>
+    <LegalLayout
+      title="Política de Privacidade"
+      lastUpdate="05/06/2026"
+      version="1.0"
+      current="privacidade"
+    >
+      <p>
+        A <strong>G.C DIVULGA EMPRESAS LTDA</strong> ("Divulga Empresas", "nós")
+        respeita sua privacidade e está comprometida com a proteção dos seus
+        dados pessoais. Esta política descreve como coletamos, usamos,
+        armazenamos e protegemos as informações dos visitantes do site <code
+          >divulgaempresasmarketing.com.br</code
+        >, em conformidade com a Lei Geral de Proteção de Dados (Lei nº
+        13.709/2018 — LGPD).
+      </p>
+
+      <h2>1. Quem somos</h2>
+      <p>
+        <strong>Razão Social:</strong> G.C DIVULGA EMPRESAS LTDA<br />
+        <strong>Nome fantasia:</strong> Divulga Empresas<br />
+        <strong>CNPJ:</strong> 64.597.498/0001-02<br />
+        <strong>Endereço:</strong> Rua Luiz Pastorelli, 1788, Jardim Palmeiras, Potirendaba-SP,
+        CEP 15.107-028<br />
+        <strong>Email para contato sobre privacidade:</strong>
+        <a href="mailto:agenciadivulgaempresas@gmail.com"
+          >agenciadivulgaempresas@gmail.com</a
+        ><br />
+        <strong>WhatsApp:</strong> <a
+          href="https://wa.me/5517991087969"
+          target="_blank"
+          rel="noopener noreferrer">(17) 99108-7969</a
+        >
+      </p>
+      <p>
+        Atuamos no segmento de marketing de geolocalização, oferecendo serviços
+        de gestão de perfis no Google Meu Negócio e Google Maps para empresas no
+        interior do estado de São Paulo.
+      </p>
+
+      <h2>2. Dados que coletamos</h2>
+      <p>
+        Este site é institucional e não possui formulários de cadastro, login,
+        e-commerce ou área de membros. Os dados coletados são limitados a:
+      </p>
+
+      <h3>2.1. Dados de navegação (via cookies, mediante consentimento)</h3>
+      <ul>
+        <li>Páginas visitadas, tempo de permanência, dispositivo usado</li>
+        <li>Origem do tráfego (de onde você veio)</li>
+        <li>
+          Localização aproximada (cidade, com base no IP — sempre anonimizado)
+        </li>
+        <li>Idioma do navegador</li>
+      </ul>
+
+      <h3>2.2. Dados que você fornece voluntariamente</h3>
+      <p>
+        Ao clicar nos botões de WhatsApp e iniciar uma conversa, você transfere
+        seus dados de contato (nome de exibição, número de telefone) para o
+        ambiente do WhatsApp Business. Esse dado é tratado conforme a <a
+          href="https://www.whatsapp.com/legal/privacy-policy"
+          target="_blank"
+          rel="noopener noreferrer">Política de Privacidade do WhatsApp</a
+        > e, a partir do momento que você inicia a conversa, pela Divulga Empresas
+        conforme esta política.
+      </p>
+
+      <h2>3. Finalidade do tratamento</h2>
+      <p>Tratamos seus dados para:</p>
+      <ul>
+        <li>Funcionamento técnico do site</li>
+        <li>Análise de uso pra melhorar a experiência</li>
+        <li>Mensuração de eficácia de canais de divulgação</li>
+        <li>Atendimento de solicitações comerciais iniciadas via WhatsApp</li>
+      </ul>
+
+      <h2>4. Base legal</h2>
+      <p>
+        O tratamento dos seus dados ocorre nas seguintes bases legais (Art. 7º
+        da LGPD):
+      </p>
+      <ul>
+        <li>
+          <strong>Consentimento</strong> (Art. 7º, I) — para cookies não
+          essenciais
+        </li>
+        <li>
+          <strong>Execução de contrato ou procedimentos preliminares</strong>
+          (Art. 7º, V) — quando você inicia conversa comercial via WhatsApp
+        </li>
+        <li>
+          <strong>Legítimo interesse</strong> (Art. 7º, IX) — para cookies
+          essenciais ao funcionamento do site
+        </li>
+      </ul>
+
+      <h2>5. Compartilhamento de dados</h2>
+      <p>
+        Compartilhamos dados com terceiros estritamente para os fins descritos:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Parceiro</th>
+            <th>Finalidade</th>
+            <th>Política</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Google LLC (Google Analytics)</td>
+            <td>Mensuração de tráfego anonimizada</td>
+            <td>
+              <a
+                href="https://policies.google.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer">Privacidade do Google</a
+              >
+            </td>
+          </tr>
+          <tr>
+            <td>Meta Platforms, Inc. (Pixel/Anúncios)</td>
+            <td><em>Futuro — quando ativado</em></td>
+            <td>
+              <a
+                href="https://www.facebook.com/privacy/policy"
+                target="_blank"
+                rel="noopener noreferrer">Privacidade da Meta</a
+              >
+            </td>
+          </tr>
+          <tr>
+            <td>Vercel Inc. (hospedagem)</td>
+            <td>Servir o site</td>
+            <td>
+              <a
+                href="https://vercel.com/legal/privacy-policy"
+                target="_blank"
+                rel="noopener noreferrer">Privacidade da Vercel</a
+              >
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Não vendemos seus dados a terceiros.</p>
+
+      <h2>6. Transferência internacional</h2>
+      <p>
+        Alguns dos nossos parceiros (Google, Meta, Vercel) processam dados em
+        servidores fora do Brasil, principalmente nos Estados Unidos. Essas
+        empresas adotam padrões compatíveis com a LGPD para proteger os dados em
+        trânsito e armazenamento.
+      </p>
+
+      <h2>7. Retenção</h2>
+      <ul>
+        <li>
+          Cookies de análise (Google Analytics): retenção máxima de 14 meses
+        </li>
+        <li>
+          Conversas iniciadas via WhatsApp: pelo período em que a relação
+          comercial estiver ativa, mais o prazo legal de guarda fiscal aplicável
+        </li>
+      </ul>
+
+      <h2>8. Seus direitos como titular</h2>
+      <p>Conforme o Art. 18 da LGPD, você tem direito a:</p>
+      <ul>
+        <li>
+          <strong>Confirmação e acesso</strong> — saber se tratamos seus dados e
+          quais
+        </li>
+        <li>
+          <strong>Correção</strong> — solicitar correção de dados incompletos ou
+          desatualizados
+        </li>
+        <li>
+          <strong>Anonimização, bloqueio ou eliminação</strong> — de dados
+          desnecessários ou tratados em desconformidade
+        </li>
+        <li>
+          <strong>Portabilidade</strong> — solicitar a transferência dos seus
+          dados a outro fornecedor
+        </li>
+        <li>
+          <strong>Eliminação</strong> — solicitar a exclusão dos dados tratados
+          com base no consentimento
+        </li>
+        <li>
+          <strong>Informação sobre compartilhamento</strong> — saber com quais
+          entidades públicas e privadas compartilhamos seus dados
+        </li>
+        <li>
+          <strong>Revogação de consentimento</strong> — a qualquer momento, sem
+          prejuízo da licitude do tratamento anterior
+        </li>
+      </ul>
+      <p>Para exercer qualquer direito, entre em contato pelos canais:</p>
+      <ul>
+        <li>
+          <strong>WhatsApp:</strong>
+          <a
+            href="https://wa.me/5517991087969"
+            target="_blank"
+            rel="noopener noreferrer">(17) 99108-7969</a
+          >
+        </li>
+        <li>
+          <strong>Email:</strong>
+          <a href="mailto:agenciadivulgaempresas@gmail.com"
+            >agenciadivulgaempresas@gmail.com</a
+          >
+        </li>
+      </ul>
+      <p>Responderemos sua solicitação em até 15 dias úteis.</p>
+
+      <h2>9. Encarregado de Dados (DPO)</h2>
+      <p>
+        O encarregado pela proteção de dados é <strong>Gabriel Zilli</strong>,
+        sócio da Divulga Empresas. Contato:
+      </p>
+      <ul>
+        <li>
+          WhatsApp: <a
+            href="https://wa.me/5517991087969"
+            target="_blank"
+            rel="noopener noreferrer">(17) 99108-7969</a
+          >
+        </li>
+        <li>
+          Email: <a href="mailto:agenciadivulgaempresas@gmail.com"
+            >agenciadivulgaempresas@gmail.com</a
+          >
+        </li>
+      </ul>
+
+      <h2>10. Cookies</h2>
+      <p>
+        O uso de cookies é regido pela nossa <a href="/politica-de-cookies"
+          >Política de Cookies</a
+        >, que detalha as categorias usadas e como você pode gerenciar suas
+        preferências a qualquer momento.
+      </p>
+
+      <h2>11. Alterações nesta política</h2>
+      <p>
+        Esta política pode ser atualizada para refletir mudanças legais ou na
+        forma como tratamos os dados. A data da última atualização aparece no
+        topo do documento. Mudanças significativas serão comunicadas via banner
+        no site.
+      </p>
+
+      <h2>12. Reclamações</h2>
+      <p>
+        Se você acredita que seus direitos não foram respeitados, pode entrar em
+        contato com a <strong
+          >Autoridade Nacional de Proteção de Dados (ANPD)</strong
+        >: <a
+          href="https://www.gov.br/anpd/pt-br"
+          target="_blank"
+          rel="noopener noreferrer">www.gov.br/anpd</a
+        >.
+      </p>
+    </LegalLayout>
+  </main>
+  <Footer />
+  <WhatsAppFloat />
+</Layout>

@@ -1,0 +1,222 @@
+---
+/* Wrapper visual pras 3 páginas legais (privacidade, termos, cookies).
+   Cuida do header de documento, container max-width, tipografia de leitura
+   confortável e do rodapé com navegação cruzada entre as 3 páginas. */
+
+interface Props {
+  title: string;
+  lastUpdate: string;
+  version: string;
+  /** Slug da página atual pra esconder do rodapé de navegação cruzada. */
+  current: "privacidade" | "termos" | "cookies";
+}
+
+const { title, lastUpdate, version, current } = Astro.props;
+
+const paginas = [
+  {
+    slug: "privacidade",
+    href: "/politica-de-privacidade",
+    label: "Política de Privacidade",
+  },
+  {
+    slug: "termos",
+    href: "/termos-de-uso",
+    label: "Termos de Uso",
+  },
+  {
+    slug: "cookies",
+    href: "/politica-de-cookies",
+    label: "Política de Cookies",
+  },
+];
+const outras = paginas.filter((p) => p.slug !== current);
+---
+
+<section class="py-10 lg:py-14 bg-white">
+  <div class="legal-container">
+    <a href="/" class="legal-back">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+      Voltar ao site
+    </a>
+
+    <header class="legal-header">
+      <h1 class="legal-title">{title}</h1>
+      <div class="legal-meta">
+        <span>Última atualização: <strong>{lastUpdate}</strong></span>
+        <span class="legal-meta-dot" aria-hidden="true">·</span>
+        <span>Versão: <strong>{version}</strong></span>
+      </div>
+    </header>
+
+    <article class="legal-prose">
+      <slot />
+    </article>
+
+    <nav class="legal-nav" aria-label="Outras páginas legais">
+      {outras.map((p) => <a href={p.href}>{p.label}</a>)}
+    </nav>
+  </div>
+</section>
+
+<style>
+  .legal-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  .legal-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--texto-suave);
+    text-decoration: none;
+    margin-bottom: 28px;
+    transition: color 150ms;
+  }
+  .legal-back:hover {
+    color: var(--azul);
+  }
+  .legal-header {
+    margin-bottom: 36px;
+  }
+  .legal-title {
+    font-size: clamp(28px, 4vw, 36px);
+    font-weight: 800;
+    color: var(--texto);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 12px;
+  }
+  .legal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--texto-mais-suave);
+  }
+  .legal-meta strong {
+    color: var(--texto-suave);
+    font-weight: 600;
+  }
+  .legal-meta-dot {
+    color: var(--texto-mais-suave);
+  }
+
+  /* Tipografia tipo "prose" pra leitura confortável */
+  .legal-prose {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--texto);
+  }
+  .legal-prose :global(h2) {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--texto);
+    margin: 36px 0 12px;
+    line-height: 1.25;
+  }
+  .legal-prose :global(h3) {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--texto);
+    margin: 24px 0 8px;
+    line-height: 1.3;
+  }
+  .legal-prose :global(p) {
+    margin: 0 0 14px;
+    color: var(--texto-suave);
+  }
+  .legal-prose :global(strong) {
+    color: var(--texto);
+  }
+  .legal-prose :global(a) {
+    color: var(--azul);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+  .legal-prose :global(a:hover) {
+    color: var(--azul-dark);
+  }
+  .legal-prose :global(ul),
+  .legal-prose :global(ol) {
+    margin: 0 0 14px;
+    padding-left: 22px;
+    color: var(--texto-suave);
+  }
+  .legal-prose :global(li) {
+    margin-bottom: 6px;
+  }
+  .legal-prose :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0 22px;
+    font-size: 14px;
+  }
+  .legal-prose :global(th),
+  .legal-prose :global(td) {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--borda);
+    vertical-align: top;
+    color: var(--texto-suave);
+  }
+  .legal-prose :global(th) {
+    background: var(--bg-suave);
+    color: var(--texto);
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .legal-prose :global(code) {
+    background: var(--bg-suave);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    color: var(--texto);
+  }
+  .legal-prose :global(blockquote) {
+    border-left: 3px solid var(--azul);
+    padding-left: 14px;
+    margin: 14px 0;
+    color: var(--texto-suave);
+  }
+
+  .legal-nav {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--borda);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+  }
+  .legal-nav a {
+    font-size: 14px;
+    color: var(--texto-suave);
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    transition:
+      background 150ms,
+      color 150ms;
+  }
+  .legal-nav a:hover {
+    background: var(--azul-soft);
+    color: var(--azul);
+  }
+</style>

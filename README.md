@@ -165,6 +165,111 @@ Se quiser uma og-image custom (com textos, mais elementos), edite `public/og-ima
 3. **Lighthouse mobile**: Chrome DevTools → Lighthouse → Mobile → Categories all → Run. Target: 90+ em Performance / Accessibility / Best Practices / SEO.
 4. **Google Search Console** (depois de configurar): submeter `sitemap.xml` (https://search.google.com/search-console).
 
+## Conformidade LGPD e Analytics
+
+Sistema próprio de gestão de consentimento (sem dependência de bibliotecas externas tipo Cookiebot), integrado com Google Consent Mode v2 e Google Analytics 4. Tudo vanilla TS, sob nosso controle.
+
+### Arquivos envolvidos
+
+| Arquivo | Responsabilidade |
+| --- | --- |
+| `src/components/consent/ConsentManager.astro` | Banner inferior, modal de preferências, lógica de consent, expõe `window.DivulgaConsent` |
+| `src/layouts/Layout.astro` (head) | Bootstrap do consent default (DENIED), aplica consent salvo, carrega GA4 |
+| `src/components/legal/LegalLayout.astro` | Wrapper visual pras 3 páginas legais (back link, header, nav cruzada) |
+| `src/pages/politica-de-privacidade.astro` | Política de Privacidade |
+| `src/pages/termos-de-uso.astro` | Termos de Uso |
+| `src/pages/politica-de-cookies.astro` | Política de Cookies (com botão "Abrir preferências") |
+| `src/components/Footer.astro` | Linha legal com 4 links (3 páginas + botão preferências) |
+| `.env.example` | Variáveis públicas (`PUBLIC_GA4_ID`, `PUBLIC_META_PIXEL_ID`) |
+
+### Como o sistema funciona
+
+1. **Bootstrap (head do Layout)**: roda `gtag('consent', 'default', ...)` com **tudo DENIED** (LGPD-first). Logo em seguida lê `localStorage.divulga_consent_v1` — se já houver consentimento salvo, aplica via `gtag('consent', 'update', ...)`. Isso roda **antes** do GA4 carregar, então nenhum hit sai sem consent.
+
+2. **GA4 carrega**: só se `PUBLIC_GA4_ID` estiver setado. Configurado com `anonymize_ip: true` e `allow_google_signals: false`.
+
+3. **Banner**: aparece quando não há consent salvo OU quando a versão dos termos foi atualizada (ver "Como forçar reconsentimento" abaixo).
+
+4. **Modal de preferências**: aberto via "Personalizar" no banner, ou via `window.DivulgaConsent.open()` (botão no footer + botão na página de cookies).
+
+5. **Cada decisão do usuário** (aceitar, rejeitar, salvar custom) grava no localStorage E dispara `gtag('consent', 'update', ...)` na hora.
+
+### API pública
+
+Disponível como `window.DivulgaConsent`:
+
+```typescript
+window.DivulgaConsent.open()        // abre o modal
+window.DivulgaConsent.acceptAll()   // aceita tudo
+window.DivulgaConsent.rejectAll()   // rejeita tudo (exceto necessários)
+window.DivulgaConsent.get()         // retorna ConsentState | null
+window.DivulgaConsent.reset()       // limpa consent e mostra banner
+```
+
+### Variáveis de ambiente
+
+```bash
+# .env (copiar do .env.example)
+SITE_URL=                                  # opcional, sobrescreve default
+PUBLIC_GA4_ID=G-4FV1N8PM5Z                 # vazio = não carrega GA4
+PUBLIC_META_PIXEL_ID=                      # vazio = não carrega Pixel
+```
+
+Em produção, definir no Vercel: **Settings → Environment Variables**.
+
+### Como adicionar uma nova categoria de cookie
+
+1. Em `ConsentManager.astro`, adicionar `<section class="consent-cat">` com nome, descrição e `<input data-consent-toggle="nova_categoria">`.
+2. Atualizar o tipo `Preferences` no script.
+3. Adicionar lógica no `pushConsentUpdate` (mapear pra um `_storage` do Consent Mode v2 ou pra um SDK próprio).
+4. Atualizar `defaultPreferences()`, `acceptAll()` e `saveCustom()`.
+5. Documentar na Política de Cookies (categoria + tabela).
+
+### Como forçar reconsentimento (após atualizar políticas)
+
+No topo do `<script>` do `ConsentManager.astro`, incrementar a constante:
+
+```typescript
+const CONSENT_VERSION = "1.0"; // → "1.1"
+```
+
+Todo usuário com `version` antiga no localStorage vai ver o banner de novo automaticamente. O consent anterior fica no `history[]` pra rastro de auditoria.
+
+### Como ativar o Meta Pixel quando o cliente decidir
+
+1. Definir `PUBLIC_META_PIXEL_ID` no `.env` (ou nas env vars do Vercel) com o ID real.
+2. Em `src/layouts/Layout.astro`, descomentar o bloco "META PIXEL" (procurar pelo comentário).
+3. Em `src/components/consent/ConsentManager.astro`, dentro de `pushConsentUpdate()`, descomentar o bloco:
+   ```typescript
+   // if (typeof w.fbq === "function") {
+   //   w.fbq("consent", prefs.marketing ? "grant" : "revoke");
+   // }
+   ```
+4. Atualizar a Política de Cookies adicionando os cookies do Pixel na tabela de "Marketing".
+5. Atualizar a Política de Privacidade marcando o parceiro Meta como ativo (remover o "Futuro — quando ativado").
+6. Incrementar `CONSENT_VERSION` pra forçar reconsentimento (boa prática quando se ativa novo rastreamento).
+
+### Como testar o consent mode no DevTools
+
+1. Abra o site numa aba anônima (estado limpo).
+2. DevTools → **Application** → Local Storage → confirme que `divulga_consent_v1` ainda **não existe**.
+3. DevTools → **Network** → filtre por `google-analytics` ou `gtag` → confirme que NENHUM hit sai antes do consent.
+4. Clique "Aceitar todos" no banner.
+5. Network agora mostra hit pra `collect?...` do GA4 — coleta ativa.
+6. DevTools → **Console** → rode `window.DivulgaConsent.get()` pra inspecionar o estado completo.
+7. Pra inspecionar o que foi enviado pro Consent Mode:
+   ```javascript
+   window.dataLayer.filter(e => e?.[0] === 'consent')
+   ```
+
+### Validações recomendadas após deploy
+
+1. **JSON-LD** (incluindo as 3 páginas legais): cole cada URL pública em https://validator.schema.org/ → confirme zero erros.
+2. **Open Graph**: cole a URL em https://www.opengraph.xyz/.
+3. **Lighthouse mobile**: target 90+ em Performance / Accessibility / Best Practices / SEO.
+4. **Google Search Console**: submeter `sitemap-index.xml` (as 3 páginas legais entram automaticamente).
+5. **Google Tag Assistant** (extensão Chrome): confirmar que GA4 só dispara com consent ativo.
+
 ## Acessibilidade e performance
 
 - `lang="pt-BR"` no `<html>`, hierarquia de headings limpa (h1 → h2 → h3)

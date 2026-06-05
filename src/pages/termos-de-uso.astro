@@ -1,0 +1,167 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import WhatsAppFloat from "../components/WhatsAppFloat.astro";
+import LegalLayout from "../components/legal/LegalLayout.astro";
+
+const siteOrigin = Astro.site?.toString().replace(/\/$/, "") ?? "";
+const pageUrl = `${siteOrigin}/termos-de-uso`;
+
+const extraSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Termos de Uso",
+  description: "Termos de Uso do site da Divulga Empresas.",
+  url: pageUrl,
+  publisher: { "@id": `${siteOrigin}/#business` },
+  inLanguage: "pt-BR",
+};
+
+const description =
+  "Termos de Uso do site da Divulga Empresas. Regras gerais de uso, propriedade intelectual, limitação de responsabilidade e contato.";
+---
+
+<Layout
+  title="Termos de Uso — Divulga Empresas"
+  description={description}
+  extraSchema={extraSchema}
+>
+  <Header />
+  <main>
+    <LegalLayout
+      title="Termos de Uso"
+      lastUpdate="05/06/2026"
+      version="1.0"
+      current="termos"
+    >
+      <p>
+        Bem-vindo ao site da Divulga Empresas. Ao acessar e usar <code
+          >divulgaempresasmarketing.com.br</code
+        >, você concorda com estes Termos de Uso. Leia atentamente.
+      </p>
+
+      <h2>1. Sobre nós</h2>
+      <p>
+        Este site é operado por <strong>G.C DIVULGA EMPRESAS LTDA</strong>,
+        CNPJ 64.597.498/0001-02, com sede na Rua Luiz Pastorelli, 1788, Jardim
+        Palmeiras, Potirendaba-SP, CEP 15.107-028.
+      </p>
+
+      <h2>2. Objetivo do site</h2>
+      <p>
+        Este site é institucional e tem como objetivo apresentar os serviços da
+        Divulga Empresas, facilitar o contato comercial via WhatsApp e fornecer
+        informações sobre nossa atuação.
+      </p>
+      <p>
+        O site não realiza vendas online, cadastros ou processamento de
+        pagamentos.
+      </p>
+
+      <h2>3. Uso adequado</h2>
+      <p>Ao usar este site, você se compromete a:</p>
+      <ul>
+        <li>Acessar o conteúdo de forma lícita e ética</li>
+        <li>
+          Não tentar acessar áreas restritas ou explorar vulnerabilidades
+          técnicas
+        </li>
+        <li>
+          Não usar bots, scrapers ou outros meios automatizados de coleta de
+          informações sem autorização
+        </li>
+        <li>
+          Não reproduzir, distribuir ou modificar o conteúdo sem nossa
+          autorização expressa
+        </li>
+      </ul>
+
+      <h2>4. Propriedade intelectual</h2>
+      <p>
+        Todo o conteúdo do site — incluindo textos, imagens, logos, design e
+        código — é propriedade da Divulga Empresas ou utilizado mediante
+        licença. Reprodução requer autorização prévia.
+      </p>
+      <p>
+        As logos dos clientes exibidas na seção "Empresas que já confiam na
+        Divulga" são marcas registradas de seus respectivos proprietários e são
+        exibidas com autorização para fins de demonstração de portfólio.
+      </p>
+
+      <h2>5. Links externos</h2>
+      <p>
+        Este site contém links para serviços externos (WhatsApp, Google Maps,
+        etc). Não nos responsabilizamos pelo conteúdo, políticas ou práticas
+        desses sites de terceiros.
+      </p>
+
+      <h2>6. Limitação de responsabilidade</h2>
+      <p>
+        As informações deste site são oferecidas com a maior diligência
+        possível, mas:
+      </p>
+      <ul>
+        <li>
+          Podemos atualizar valores, planos e condições a qualquer momento sem
+          aviso prévio
+        </li>
+        <li>Não garantimos disponibilidade ininterrupta do site</li>
+        <li>
+          O valor "a partir de R$ 59,90/mês" é referencial — o investimento real
+          depende do plano escolhido e é confirmado durante o atendimento
+          comercial
+        </li>
+      </ul>
+
+      <h2>7. Atendimento e contratação</h2>
+      <p>
+        Todo atendimento comercial ocorre via WhatsApp ou presencialmente.
+        Contratos, valores e condições específicas são acordados em conversa
+        direta com a equipe comercial. Os termos deste site
+        <strong>não constituem contrato</strong> entre as partes.
+      </p>
+
+      <h2>8. Privacidade</h2>
+      <p>
+        O tratamento dos seus dados é regido por nossa <a
+          href="/politica-de-privacidade">Política de Privacidade</a
+        > e <a href="/politica-de-cookies">Política de Cookies</a>.
+      </p>
+
+      <h2>9. Alterações nos termos</h2>
+      <p>
+        Estes Termos podem ser alterados a qualquer momento. A versão vigente é
+        sempre a publicada nesta página, com a data de "Última atualização"
+        atualizada.
+      </p>
+
+      <h2>10. Legislação aplicável</h2>
+      <p>
+        Estes Termos são regidos pela legislação brasileira. Eventuais disputas
+        serão resolvidas no foro da comarca de Potirendaba-SP, salvo disposição
+        legal em contrário.
+      </p>
+
+      <h2>11. Contato</h2>
+      <ul>
+        <li>
+          <strong>WhatsApp:</strong>
+          <a
+            href="https://wa.me/5517991087969"
+            target="_blank"
+            rel="noopener noreferrer">(17) 99108-7969</a
+          >
+        </li>
+        <li>
+          <strong>Email:</strong>
+          <a href="mailto:agenciadivulgaempresas@gmail.com"
+            >agenciadivulgaempresas@gmail.com</a
+          >
+        </li>
+      </ul>
+    </LegalLayout>
+  </main>
+  <Footer />
+  <WhatsAppFloat />
+</Layout>

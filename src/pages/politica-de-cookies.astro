@@ -1,0 +1,246 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import WhatsAppFloat from "../components/WhatsAppFloat.astro";
+import LegalLayout from "../components/legal/LegalLayout.astro";
+
+const siteOrigin = Astro.site?.toString().replace(/\/$/, "") ?? "";
+const pageUrl = `${siteOrigin}/politica-de-cookies`;
+
+const extraSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Política de Cookies",
+  description:
+    "Política de Cookies da Divulga Empresas — categorias de cookies usadas e como gerenciar suas preferências.",
+  url: pageUrl,
+  publisher: { "@id": `${siteOrigin}/#business` },
+  inLanguage: "pt-BR",
+};
+
+const description =
+  "Política de Cookies da Divulga Empresas. Categorias de cookies usadas, finalidade e como gerenciar suas preferências a qualquer momento.";
+---
+
+<Layout
+  title="Política de Cookies — Divulga Empresas"
+  description={description}
+  extraSchema={extraSchema}
+>
+  <Header />
+  <main>
+    <LegalLayout
+      title="Política de Cookies"
+      lastUpdate="05/06/2026"
+      version="1.0"
+      current="cookies"
+    >
+      <p>
+        Esta política explica como o site <code
+          >divulgaempresasmarketing.com.br</code
+        > usa cookies e tecnologias similares, e como você pode gerenciar suas
+        preferências.
+      </p>
+
+      <h2>1. O que são cookies?</h2>
+      <p>
+        Cookies são pequenos arquivos de texto que sites armazenam no seu
+        navegador para guardar preferências, manter sessões ativas, medir uso e
+        personalizar conteúdo.
+      </p>
+
+      <h2>2. Categorias de cookies que usamos</h2>
+      <p>
+        Dividimos os cookies em 4 categorias. Você pode aceitar todas, recusar
+        todas (exceto as essenciais) ou personalizar suas escolhas.
+      </p>
+
+      <h3>2.1. Cookies necessários <em>(sempre ativos)</em></h3>
+      <p>
+        Indispensáveis pra que o site funcione. Sem eles, recursos básicos não
+        operam.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Cookie</th>
+            <th>Origem</th>
+            <th>Finalidade</th>
+            <th>Retenção</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>divulga_consent_v1</code></td>
+            <td>Próprio site</td>
+            <td>Armazenar sua escolha de cookies</td>
+            <td>1 ano</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>
+        2.2. Cookies de funcionalidade <em>(opcionais — default desligado)</em>
+      </h3>
+      <p>
+        Lembrança de preferências (ex: tema, idioma) que melhoram sua
+        experiência.
+      </p>
+      <p>
+        <em
+          >Atualmente este site não usa cookies de funcionalidade ativos.</em
+        >
+      </p>
+
+      <h3>2.3. Cookies de análise <em>(opcionais — default desligado)</em></h3>
+      <p>
+        Coletam dados anônimos sobre uso do site (páginas visitadas, tempo de
+        leitura, origem do tráfego). Nos ajudam a entender o que funciona e o
+        que pode melhorar.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Cookie</th>
+            <th>Origem</th>
+            <th>Finalidade</th>
+            <th>Retenção</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>_ga</code>, <code>_ga_*</code></td>
+            <td>Google Analytics 4</td>
+            <td>Análise de tráfego anonimizada</td>
+            <td>14 meses</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>
+        2.4. Cookies de marketing <em>(opcionais — default desligado)</em>
+      </h3>
+      <p>
+        Usados pra personalizar anúncios em outras plataformas e medir eficácia
+        de campanhas.
+      </p>
+      <p>
+        <em
+          >Atualmente este site não usa cookies de marketing ativos. Esta
+          categoria fica disponível para ativação futura, mediante seu
+          consentimento.</em
+        >
+      </p>
+
+      <h2>3. Como gerenciar suas preferências</h2>
+      <p>Você pode ajustar suas preferências de cookies a qualquer momento:</p>
+      <ul>
+        <li>
+          Clicando em <strong>"Preferências de cookies"</strong> no rodapé deste
+          site
+        </li>
+        <li>Limpando os cookies do seu navegador</li>
+        <li>
+          Configurando seu navegador para bloquear ou alertar sobre cookies
+        </li>
+      </ul>
+
+      <p style="margin-top: 22px;">
+        <button
+          type="button"
+          class="legal-cta"
+          data-open-consent
+          aria-label="Abrir preferências de cookies"
+        >
+          Abrir preferências de cookies
+        </button>
+      </p>
+
+      <h2>4. Cookies de terceiros</h2>
+      <p>
+        Quando você consente com cookies de análise ou marketing, cookies de
+        terceiros podem ser instalados pelo Google Analytics e (no futuro) pela
+        Meta. Esses parceiros têm suas próprias políticas:
+      </p>
+      <ul>
+        <li>
+          <a
+            href="https://policies.google.com/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Google Analytics — Política de Privacidade</a
+          >
+        </li>
+        <li>
+          <a
+            href="https://www.facebook.com/privacy/policy"
+            target="_blank"
+            rel="noopener noreferrer">Meta — Política de Privacidade</a
+          >
+        </li>
+      </ul>
+
+      <h2>5. Mais informações</h2>
+      <p>
+        Para mais detalhes sobre como tratamos seus dados, consulte nossa <a
+          href="/politica-de-privacidade">Política de Privacidade</a
+        >.
+      </p>
+
+      <h2>6. Contato</h2>
+      <p>Dúvidas? Fale com a gente:</p>
+      <ul>
+        <li>
+          <strong>WhatsApp:</strong>
+          <a
+            href="https://wa.me/5517991087969"
+            target="_blank"
+            rel="noopener noreferrer">(17) 99108-7969</a
+          >
+        </li>
+        <li>
+          <strong>Email:</strong>
+          <a href="mailto:agenciadivulgaempresas@gmail.com"
+            >agenciadivulgaempresas@gmail.com</a
+          >
+        </li>
+      </ul>
+    </LegalLayout>
+  </main>
+  <Footer />
+  <WhatsAppFloat />
+</Layout>
+
+<style>
+  .legal-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    color: var(--azul);
+    border: 1px solid var(--azul);
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background 180ms,
+      color 180ms;
+    font-family: inherit;
+  }
+  .legal-cta:hover {
+    background: var(--azul-soft);
+  }
+</style>
+
+<script>
+  // Conecta o botão "Abrir preferências" ao window.DivulgaConsent.open()
+  type ConsentApi = { open: () => void };
+  type W = Window & { DivulgaConsent?: ConsentApi };
+  const btn = document.querySelector<HTMLButtonElement>("[data-open-consent]");
+  btn?.addEventListener("click", () => {
+    (window as unknown as W).DivulgaConsent?.open();
+  });
+</script>
