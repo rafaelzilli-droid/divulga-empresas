@@ -1,6 +1,6 @@
 # Divulga Empresas — site institucional
 
-Site institucional e de conversão da Divulga Empresas, agência de marketing de geolocalização de São José do Rio Preto-SP. Stack: **Astro 5 + Tailwind 4**, deploy no **Vercel** (push em `main` faz deploy automático).
+Site institucional e de conversão da **Divulga Empresas** (razão social: G.C DIVULGA EMPRESAS LTDA · CNPJ 64.597.498/0001-02). Agência de marketing de geolocalização — operação comercial em São José do Rio Preto-SP, sede fiscal em Potirendaba-SP. Stack: **Astro 5 + Tailwind 4**, deploy no **Vercel** em `divulgaempresasmarketing.com.br` (push em `main` faz deploy automático).
 
 O objetivo do site é gerar contato no WhatsApp dos sócios. Todo CTA aponta pra `wa.me/...`.
 
@@ -117,21 +117,32 @@ O site tem SEO técnico completo configurado. Tudo centralizado em **`src/layout
 - **`robots.txt`** dinâmico em `src/pages/robots.txt.ts` (usa `Astro.site`)
 - **Sitemap** automático via `@astrojs/sitemap` (em `/sitemap-index.xml`)
 
-### Como trocar o domínio quando comprar
+### Identidade fiscal vs comercial
 
-Tudo aponta pra uma única fonte: a env var **`SITE_URL`**. Hoje o default é `https://divulga-empresas.vercel.app`.
+A empresa é registrada em duas cidades diferentes:
 
-Quando o cliente comprar o domínio próprio:
+- **Operação comercial** (visível em todo o site): **São José do Rio Preto-SP**
+  - Aparece em: copy do site, meta tags `geo.*`, JSON-LD `geo.latitude/longitude`, mapa, footer principal
+  - Coordenadas: `-20.8113, -49.3758`
 
-1. **No Vercel** (Dashboard → Settings → Environment Variables), adicione:
-   ```
-   SITE_URL=https://novodominio.com.br
-   ```
-2. Aponte o DNS do domínio pro Vercel (CNAME ou A record).
-3. Adicione o domínio na aba "Domains" do projeto Vercel.
+- **Sede fiscal** (registrada no CNPJ, citada em pontos formais): **Potirendaba-SP**
+  - Aparece em: JSON-LD `address` (streetAddress, postalCode), linha fiscal pequena no footer, páginas legais futuras
+  - Endereço: Rua Luiz Pastorelli, 1788, Jardim Palmeiras, Potirendaba-SP, CEP 15.107-028
+
+Essa separação é prática comum (empresa registrada em uma cidade, opera comercialmente em outra). O Schema.org `LocalBusiness` resolve isso usando `address` pro fiscal e `geo` pro comercial — ambos válidos.
+
+### Como trocar o domínio
+
+Tudo aponta pra uma única fonte: a env var **`SITE_URL`**. Hoje o default é `https://divulgaempresasmarketing.com.br`.
+
+Pra configurar/trocar:
+
+1. **DNS do domínio:** apontar pro Vercel (CNAME `cname.vercel-dns.com` ou A records que o painel mostra).
+2. **Vercel → Settings → Domains:** adicionar o domínio.
+3. **Vercel → Settings → Environment Variables** (opcional, se for outro domínio que não o default): `SITE_URL=https://novodominio.com.br`.
 4. Redeploy.
 
-Pronto. Canonical, OG image URL, Schema.org URLs, sitemap e robots.txt vão todos passar a usar o novo domínio sem mexer no código.
+Canonical, OG image URL, Schema.org URLs, sitemap e robots.txt vão todos usar `SITE_URL` automaticamente.
 
 Pra testar localmente com URL diferente:
 

@@ -10,23 +10,31 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
+  ogDescription?: string;
   ogImage?: string;
   canonical?: string;
 }
 
 const DEFAULT_TITLE =
-  "Divulga Empresas — Marketing de Geolocalização no Google | São José do Rio Preto-SP";
+  "Divulga Empresas — Marketing de Geolocalização no Google | São José do Rio Preto";
+
+// Description longa pra <meta name="description"> (SEO)
 const DEFAULT_DESCRIPTION =
-  "A Divulga Empresas cuida do seu perfil no Google e no Google Maps pra você ser encontrado por quem busca um negócio como o seu. +800 empresas atendidas no noroeste paulista.";
+  "A Divulga cuida do seu perfil no Google e no Google Maps pra você ser encontrado por quem busca um negócio como o seu. Atendimento presencial em São José do Rio Preto e todo o noroeste paulista. Mais de 800 empresas atendidas.";
+
+// Description mais curta pra Open Graph / Twitter (preview de link social)
+const DEFAULT_OG_DESCRIPTION =
+  "A Divulga cuida do seu perfil no Google pra você ser encontrado por quem busca um negócio como o seu. +800 empresas atendidas.";
 
 const {
   title = DEFAULT_TITLE,
   description = DEFAULT_DESCRIPTION,
+  ogDescription = DEFAULT_OG_DESCRIPTION,
   ogImage = "/og-image.png",
   canonical,
 } = Astro.props;
 
-// URLs absolutas — Astro.site vem do config (https://divulga-empresas.vercel.app
+// URLs absolutas — Astro.site vem do config (https://divulgaempresasmarketing.com.br
 // por padrão, ou o que estiver em SITE_URL)
 const canonicalURL =
   canonical ?? new URL(Astro.url.pathname, Astro.site).toString();
@@ -45,18 +53,26 @@ const schemaGraph = {
       "@type": "LocalBusiness",
       "@id": businessId,
       name: "Divulga Empresas",
+      legalName: "G.C DIVULGA EMPRESAS LTDA",
       alternateName: "Divulga Empresas — Marketing de Geolocalização",
       description:
-        "Empresa especializada em gestão de perfil no Google Meu Negócio e Google Maps para pequenos e médios negócios do interior paulista.",
+        "Empresa especializada em gestão de perfil no Google Meu Negócio e Google Maps para pequenos e médios negócios do interior paulista. Atendimento presencial em São José do Rio Preto e região.",
       url: `${siteOrigin}/`,
       logo: logoURL,
       image: ogImageURL,
       telephone: "+5517991087969",
-      priceRange: "R$ 59,90/mês +",
+      email: "agenciadivulgaempresas@gmail.com",
+      taxID: "64.597.498/0001-02",
+      priceRange: "R$$",
+      // address = endereço FISCAL registrado no CNPJ (Potirendaba).
+      // A operação comercial fica em São José do Rio Preto — representada
+      // pelo geo abaixo e pela copy do site.
       address: {
         "@type": "PostalAddress",
-        addressLocality: "São José do Rio Preto",
+        streetAddress: "Rua Luiz Pastorelli, 1788",
+        addressLocality: "Potirendaba",
         addressRegion: "SP",
+        postalCode: "15107-028",
         addressCountry: "BR",
       },
       geo: {
@@ -124,7 +140,7 @@ const schemaGraph = {
           name: "Quais cidades a Divulga atende?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "Atendemos todo o noroeste paulista, incluindo São José do Rio Preto (nossa sede), Fernandópolis, Votuporanga, Potirendaba, Jales, Cardoso e cidades vizinhas. Nosso atendimento é presencial, com visitas no seu negócio.",
+            text: "Atendemos todo o noroeste paulista, incluindo São José do Rio Preto, Votuporanga, Fernandópolis, Potirendaba, Jales, Cardoso e cidades vizinhas. Nosso atendimento é presencial, com visitas no seu negócio.",
           },
         },
         {
@@ -154,6 +170,8 @@ const schemaGraph = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="content-language" content="pt-BR" />
     <meta name="generator" content={Astro.generator} />
 
     <title>{title}</title>
@@ -161,9 +179,13 @@ const schemaGraph = {
     <meta name="author" content="Divulga Empresas" />
     <meta
       name="keywords"
-      content="Google Meu Negócio, Google Maps, marketing local, geolocalização, São José do Rio Preto, Rio Preto, Fernandópolis, Votuporanga, noroeste paulista, perfil empresa Google, SEO local interior"
+      content="marketing de geolocalização, google meu negócio, perfil google empresa, gestão google maps, são josé do rio preto, votuporanga, jales, fernandópolis, potirendaba, interior paulista, presença digital pequenas empresas, divulga empresas"
     />
-    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1"
+    />
+    <meta name="googlebot" content="index, follow" />
 
     <!-- Geo tags pra busca local -->
     <meta name="geo.region" content="BR-SP" />
@@ -173,6 +195,7 @@ const schemaGraph = {
 
     <!-- Theme color (PWA / mobile) -->
     <meta name="theme-color" content="#2A6FDB" />
+    <meta name="msapplication-TileColor" content="#2A6FDB" />
 
     <link rel="canonical" href={canonicalURL} />
 
@@ -215,26 +238,21 @@ const schemaGraph = {
     <meta property="og:site_name" content="Divulga Empresas" />
     <meta property="og:locale" content="pt_BR" />
     <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+    <meta property="og:description" content={ogDescription} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:image" content={ogImageURL} />
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta
-      property="og:image:alt"
-      content="Logo da Divulga Empresas — Marketing de Geolocalização no Google"
-    />
+    <meta property="og:image:alt" content="Logo da Divulga Empresas" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
     <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:description" content={ogDescription} />
     <meta name="twitter:image" content={ogImageURL} />
-    <meta
-      name="twitter:image:alt"
-      content="Logo da Divulga Empresas — Marketing de Geolocalização no Google"
-    />
+    <meta name="twitter:image:alt" content="Logo da Divulga Empresas" />
 
     <!-- Schema.org structured data: LocalBusiness + Service (+ Offers) + FAQPage -->
     <script

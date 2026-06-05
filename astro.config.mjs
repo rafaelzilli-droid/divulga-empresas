@@ -11,7 +11,8 @@ import tailwindcss from "@tailwindcss/vite";
  * que tudo (canonical, sitemap, robots.txt, schema.org, OG image URL) vai
  * apontar pro lugar certo.
  */
-const SITE_URL = process.env.SITE_URL ?? "https://divulga-empresas.vercel.app";
+const SITE_URL =
+  process.env.SITE_URL ?? "https://divulgaempresasmarketing.com.br";
 
 export default defineConfig({
   site: SITE_URL,
